@@ -4,7 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
-import { BookOpen, ArrowLeft, Plus, GraduationCap } from "lucide-react";
+import { ArrowLeft, Plus, GraduationCap } from "lucide-react";
 import api from "../../utils/api";
 
 interface Chapter {
@@ -45,11 +45,12 @@ export default function LessonDetailsPage() {
 
 		try {
 			setLoading(true);
-			const [lessonResponse, chaptersResponse, progressResponse] = await Promise.all([
-				api.get(`/Lesson/${lessonId}`),
-				api.get(`/Chapter/lesson/${lessonId}`),
-				api.get(`/UserProgress/lesson/${lessonId}`)
-			]);
+			const [lessonResponse, chaptersResponse, progressResponse] =
+				await Promise.all([
+					api.get(`/Lesson/${lessonId}`),
+					api.get(`/Chapter/lesson/${lessonId}`),
+					api.get(`/UserProgress/lesson/${lessonId}`),
+				]);
 
 			if (!lessonResponse?.data) {
 				throw new Error("Lesson not found");
@@ -61,36 +62,49 @@ export default function LessonDetailsPage() {
 			setCourseTitle(lessonResponse.data.courseTitle || "");
 
 			const chaptersData = chaptersResponse.data || [];
-			const chapterProgress = progressResponse.data || { completedChapters: 0, totalChapters: 0, progressPercentage: 0 };
-			
+			const chapterProgress = progressResponse.data || {
+				completedChapters: 0,
+				totalChapters: 0,
+				progressPercentage: 0,
+			};
+
 			// Update chapters with completion status
 			const updatedChapters = chaptersData.map((chapter: Chapter) => ({
 				...chapter,
-				isCompleted: false // This will be set individually by checking each chapter
+				isCompleted: false, // This will be set individually by checking each chapter
 			}));
 			setChapters(updatedChapters);
 
 			// If not admin, fetch completion status for each chapter
 			if (!isAdmin) {
-				const chapterProgressPromises = updatedChapters.map((chapter: Chapter) =>
-					api.get(`/UserProgress/chapter/${chapter.id}`)
+				const chapterProgressPromises = updatedChapters.map(
+					(chapter: Chapter) =>
+						api.get(`/UserProgress/chapter/${chapter.id}`),
 				);
-				const chapterProgressResults = await Promise.allSettled(chapterProgressPromises);
-				
-				const updatedChaptersWithProgress = updatedChapters.map((chapter: Chapter, index: number) => {
-					const progressResult = chapterProgressResults[index];
-					return {
-						...chapter,
-						isCompleted: progressResult.status === 'fulfilled' && (progressResult.value as ChapterProgressResponse)?.data?.isCompleted
-					};
-				});
+				const chapterProgressResults = await Promise.allSettled(
+					chapterProgressPromises,
+				);
+
+				const updatedChaptersWithProgress = updatedChapters.map(
+					(chapter: Chapter, index: number) => {
+						const progressResult = chapterProgressResults[index];
+						return {
+							...chapter,
+							isCompleted:
+								progressResult.status === "fulfilled" &&
+								(
+									progressResult.value as ChapterProgressResponse
+								)?.data?.isCompleted,
+						};
+					},
+				);
 				setChapters(updatedChaptersWithProgress);
 
 				// Set overall lesson progress
 				setProgress({
 					completedChapters: chapterProgress.completedChapters,
 					totalChapters: chapterProgress.totalChapters,
-					progressPercentage: chapterProgress.progressPercentage
+					progressPercentage: chapterProgress.progressPercentage,
 				});
 			}
 		} catch (error: any) {
@@ -176,96 +190,115 @@ export default function LessonDetailsPage() {
 
 	if (loading) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white">
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 				<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--color-primary)]" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#f4fff7] to-white px-6 py-10">
-			<div className="mx-auto max-w-4xl">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+			<div className="mx-auto mb-4 max-w-4xl">
 				{/* Breadcrumb navigation */}
-				<div className="text-gray-600 mb-4 flex items-center gap-2 text-sm">
+				<div className="text-gray-600 flex items-center gap-2 text-sm">
 					{courseId && (
 						<>
 							<button
 								onClick={() => navigate(`/course/${courseId}`)}
-								className="transition-colors hover:text-[var(--color-primary)]"
+								className="transition-colors hover:text-white"
+								type="button"
 							>
 								{courseTitle}
 							</button>
-							<span>/</span>
+							<span>🚀</span>
 						</>
 					)}
 					<span className="text-[var(--color-primary)]">
 						{lessonTitle}
 					</span>
 				</div>
+			</div>
 
-				{/* Header with navigation */}
-				<motion.div
-					className="mb-8 flex flex-col items-center text-center"
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-				>
-					<BookOpen className="mb-4 h-12 w-12 text-[var(--color-primary)]" />
-					<h1 className="text-4xl font-extrabold text-[var(--color-primary)]">
-						{lessonTitle}
-					</h1>
-					<p className="text-gray-500 mt-2 text-sm">
-						{lessonDuration} minutes • {chapters.length} chapters
-					</p>
-					<div className="mt-4 flex flex-wrap justify-center gap-4">
+			{/* Header with navigation */}
+			<motion.div
+				className="mb-8 flex flex-col items-center text-center"
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
+			>
+				<div className="relative">
+					<img
+						src="/src/assets/code_icon_green.svg"
+						alt="Code icon"
+						className="mb-4 h-16 w-16"
+					/>
+					<motion.div
+						className="absolute -right-2 -top-2"
+						animate={{ y: [-4, 4, -4] }}
+						transition={{ repeat: Infinity, duration: 2 }}
+					>
+						📖
+					</motion.div>
+				</div>
+				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
+					{lessonTitle}
+				</h1>
+				<p className="text-gray-500 mt-2 flex items-center justify-center gap-2 text-lg">
+					<span>⏱️ {lessonDuration} minutes</span>
+					<span>•</span>
+					<span>📚 {chapters.length} chapters</span>
+				</p>
+				<div className="mt-4 flex flex-wrap justify-center gap-4">
+					<button
+						onClick={() => navigate(`/course/${courseId}`)}
+						className="flex transform items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+						type="button"
+					>
+						<ArrowLeft size={16} /> Back to Course
+					</button>
+					{isAdmin && (
 						<button
-							onClick={() => navigate(`/course/${courseId}`)}
-							className="bg-gray-500 hover:bg-gray-600 flex items-center gap-2 rounded-xl px-4 py-2 text-white"
+							onClick={() =>
+								navigate(
+									`/admin/lesson/${lessonId}/add-chapter`,
+								)
+							}
+							className="flex transform items-center gap-2 rounded-xl bg-[var(--color-accent)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+							type="button"
 						>
-							<ArrowLeft size={16} /> Back to Course
+							<Plus size={16} /> Add Chapter
 						</button>
-						{isAdmin && (
-							<button
-								onClick={() =>
-									navigate(
-										`/admin/lesson/${lessonId}/add-chapter`,
-									)
-								}
-								className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-							>
-								<Plus size={16} /> Add Chapter
-							</button>
-						)}
+					)}
+				</div>
+			</motion.div>
+
+			{/* Progress bar for students */}
+			{!isAdmin && chapters.length > 0 && (
+				<div className="mx-auto mb-10 max-w-xl overflow-hidden rounded-xl bg-white p-6 shadow-lg">
+					<div className="mb-2 flex justify-between">
+						<span className="text-sm font-medium">
+							Your Progress
+						</span>
+						<span className="text-sm font-medium">
+							{progress.completedChapters} /{" "}
+							{progress.totalChapters} chapters
+						</span>
 					</div>
-				</motion.div>
-
-				{/* Progress bar for students */}
-				{!isAdmin && chapters.length > 0 && (
-					<div className="mx-auto mb-10 max-w-xl rounded-xl bg-white p-4 shadow">
-						<div className="mb-2 flex justify-between">
-							<span className="text-sm font-medium">
-								Progress
-							</span>
-							<span className="text-sm font-medium">
-								{progress.completedChapters} /{" "}
-								{progress.totalChapters} chapters
-							</span>
-						</div>
-						<div className="bg-gray-200 h-2.5 w-full rounded-full">
-							<div
-								className="h-2.5 rounded-full bg-green-600 transition-all duration-500"
-								style={{
-									width: `${progress.progressPercentage}%`,
-								}}
-							/>
-						</div>
+					<div className="bg-gray-100 h-4 w-full overflow-hidden rounded-full">
+						<div
+							className="h-4 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
+							style={{ width: `${progress.progressPercentage}%` }}
+						/>
 					</div>
-				)}
+				</div>
+			)}
 
-				{/* Chapters List */}
-				<h2 className="mb-6 text-center text-2xl font-semibold text-[var(--color-primary)]">
-					Chapters in this lesson
-				</h2>
+			<h2 className="mb-6 text-center text-2xl font-semibold">
+				<span className="mr-2">📚</span>
+				Chapters in this Lesson
+			</h2>
 
+			{/* Chapters List */}
+			<div className="mx-auto max-w-2xl">
 				<DragDropContext onDragEnd={handleDragEnd}>
 					<Droppable droppableId="chapters">
 						{(provided) => (
@@ -291,74 +324,80 @@ export default function LessonDetailsPage() {
 													ref={provided.innerRef}
 													{...provided.draggableProps}
 													{...provided.dragHandleProps}
-													className="group cursor-pointer rounded-2xl border bg-white p-6 shadow-md transition-all hover:border-[var(--color-primary)] hover:shadow-xl"
-													onClick={() =>
-														navigate(
-															`/chapter/${chapter.id}`,
-														)
-													}
 												>
-													<div className="flex items-center justify-between">
+													<div
+														onClick={() =>
+															navigate(
+																`/chapter/${chapter.id}`,
+															)
+														}
+														className="group relative block transform overflow-hidden rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+													>
 														<div className="flex items-center gap-4">
-															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
+															<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-lg font-bold text-white">
 																{chapter.index}
 															</div>
 															<div>
-																<h2 className="text-xl font-semibold group-hover:text-[var(--color-primary)]">
+																<h3 className="text-lg font-semibold group-hover:text-[var(--color-primary)]">
 																	{
 																		chapter.title
 																	}
-																</h2>
+																</h3>
 															</div>
-														</div>
-														<div className="flex items-center gap-4">
-															{!isAdmin &&
-																chapter.isCompleted && (
-																	<GraduationCap
-																		className="text-green-600"
-																		size={
-																			24
+															<div className="ml-auto flex items-center gap-2">
+																{!isAdmin &&
+																	chapter.isCompleted && (
+																		<div className="animate-bounce">
+																			<GraduationCap
+																				className="text-green-600"
+																				size={
+																					24
+																				}
+																			/>
+																		</div>
+																	)}
+																{isAdmin && (
+																	<div
+																		className="hidden transform gap-2 group-hover:flex"
+																		onClick={(
+																			e,
+																		) =>
+																			e.stopPropagation()
 																		}
-																	/>
+																	>
+																		<button
+																			onClick={(
+																				e,
+																			) => {
+																				e.stopPropagation();
+																				navigate(
+																					`/admin/chapter/${chapter.id}/edit`,
+																				);
+																			}}
+																			className="rounded-lg bg-yellow-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-yellow-600"
+																			type="button"
+																		>
+																			✏️
+																			Edit
+																		</button>
+																		<button
+																			onClick={(
+																				e,
+																			) => {
+																				e.stopPropagation();
+																				handleDeleteChapter(
+																					chapter.id,
+																				);
+																			}}
+																			className="rounded-lg bg-red-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-red-600"
+																			type="button"
+																		>
+																			🗑️
+																			Delete
+																		</button>
+																	</div>
 																)}
-															{isAdmin && (
-																<div
-																	className="flex gap-2"
-																	onClick={(
-																		e,
-																	) =>
-																		e.stopPropagation()
-																	}
-																>
-																	<button
-																		onClick={(
-																			e,
-																		) => {
-																			e.stopPropagation();
-																			navigate(
-																				`/admin/chapter/${chapter.id}/edit`,
-																			);
-																		}}
-																		className="rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600"
-																	>
-																		 Edit
-																	</button>
-																	<button
-																		onClick={(
-																			e,
-																		) => {
-																			e.stopPropagation();
-																			handleDeleteChapter(
-																				chapter.id,
-																			);
-																		}}
-																		className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
-																	>
-																		
-																		Delete
-																	</button>
-																</div>
-															)}
+															</div>
 														</div>
 													</div>
 												</div>

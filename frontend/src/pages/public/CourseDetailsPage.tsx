@@ -4,7 +4,6 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
-import { BookOpen } from "lucide-react";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 interface Lesson {
@@ -177,32 +176,35 @@ const CourseDetailsPage = () => {
 			<Link
 				key={lesson.id}
 				to={`/lesson/${lesson.id}`}
-				className="border-1 group flex cursor-pointer items-center justify-between rounded-lg border p-4 shadow transition-all hover:border-[var(--color-primary)] hover:shadow-md"
+				className="group relative block transform overflow-hidden rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
 			>
 				<div className="flex items-center gap-4">
-					<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
+					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-lg font-bold text-white">
 						{lesson.index}
 					</div>
 					<div>
-						<h3 className="text-lg font-semibold">
+						<h3 className="text-lg font-semibold text-black group-hover:text-[var(--color-primary)]">
 							{lesson.title}
 						</h3>
-						<p className="text-gray-600 text-sm">
-							{lesson.duration} minutes •{" "}
-							{lesson.chapterTitles.length} chapters
+						<p className="text-gray-600 flex items-center gap-2 text-sm">
+							<span>⏱️ {lesson.duration} minutes</span>
+							<span>•</span>
+							<span>
+								📝 {lesson.chapterTitles.length} chapters
+							</span>
 						</p>
 					</div>
 				</div>
 				{isAdmin && (
 					<div
-						className="hidden gap-2 group-hover:flex"
+						className="absolute right-4 top-1/2 hidden -translate-y-1/2 transform gap-2 group-hover:flex"
 						onClick={(e) => e.preventDefault()}
 					>
 						<button
 							onClick={() =>
 								navigate(`/admin/lesson/${lesson.id}/edit`)
 							}
-							className="rounded bg-yellow-500 px-2 py-1 text-sm font-bold text-white hover:bg-yellow-600"
+							className="rounded-lg bg-yellow-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-yellow-600"
 						>
 							✏️ Edit
 						</button>
@@ -214,7 +216,7 @@ const CourseDetailsPage = () => {
 
 	if (loading || !course) {
 		return (
-			<div className="flex min-h-screen items-center justify-center">
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 				<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--color-primary)]" />
 			</div>
 		);
@@ -236,7 +238,7 @@ const CourseDetailsPage = () => {
 	}`;
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#f4fff7] to-white px-6 py-10">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
 			{/* Breadcrumb navigation */}
 			<div className="mx-auto mb-4 max-w-4xl">
 				<div className="text-gray-600 flex items-center gap-2 text-sm">
@@ -247,7 +249,7 @@ const CourseDetailsPage = () => {
 					>
 						Courses
 					</button>
-					<span>/</span>
+					<span>🚀</span>
 					<span className="text-[var(--color-primary)]">
 						{course.title}
 					</span>
@@ -259,27 +261,52 @@ const CourseDetailsPage = () => {
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 			>
-				<BookOpen className="mb-4 h-12 w-12 text-[var(--color-primary)]" />
-				<h1 className="text-5xl font-extrabold text-[var(--color-primary)]">
+				<div className="relative">
+					<img
+						src="/src/assets/code_icon_green.svg"
+						alt="Code icon"
+						className="mb-4 h-16 w-16"
+					/>
+					<div className="absolute -right-2 -top-2 animate-bounce">
+						{course.level === "Beginner" && "🌱"}
+						{course.level === "Intermediate" && "⭐"}
+						{course.level === "Advanced" && "🏆"}
+					</div>
+				</div>
+				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
 					{course.title}
 				</h1>
 				<p className="text-gray-700 mt-3 max-w-2xl text-lg">
 					{course.description}
 				</p>
-				<p className="text-gray-500 mt-2 text-sm">
-					Duration: {course.duration}h · Level: {course.level}
+				<p className="text-gray-500 mt-2 flex items-center gap-2 text-sm">
+					<span>⏱️ {course.duration}h</span>
+					<span>•</span>
+					<span>
+						{course.level === "Beginner" &&
+							"🌱 Perfect for beginners"}
+						{course.level === "Intermediate" &&
+							"⭐ Intermediate level"}
+						{course.level === "Advanced" && "🏆 For experts"}
+					</span>
 				</p>
 				{course.badge && (
-					<div className="mt-4 flex items-center gap-2">
-						<img
-							src={course.badge.icon}
-							alt={course.badge.name}
-							className="h-8 w-8"
-						/>
-						<span className="text-sm font-medium">
-							Complete this course to earn the {course.badge.name}{" "}
-							badge!
-						</span>
+					<div className="mt-4 transform rounded-xl bg-white p-4 shadow-lg transition-transform hover:scale-105">
+						<div className="flex items-center gap-2">
+							<img
+								src={course.badge.icon}
+								alt={course.badge.name}
+								className="h-12 w-12"
+							/>
+							<div className="text-left">
+								<p className="font-semibold">
+									{course.badge.name} Badge
+								</p>
+								<p className="text-gray-600 text-sm">
+									Complete the course to earn it! ✨
+								</p>
+							</div>
+						</div>
 					</div>
 				)}
 				{isAdmin && (
@@ -293,24 +320,29 @@ const CourseDetailsPage = () => {
 			</motion.div>
 
 			{!isAdmin && (
-				<div className="mx-auto mb-10 max-w-xl rounded-xl bg-white p-4 shadow">
+				<div className="mx-auto mb-10 max-w-xl overflow-hidden rounded-xl bg-white p-6 shadow-lg">
 					<div className="mb-2 flex justify-between">
-						<span className="text-sm font-medium">Progress</span>
+						<span className="text-sm font-medium">
+							Your Progress
+						</span>
 						<span className="text-sm font-medium">
 							{progress.completedLessons} /{" "}
 							{progress.totalLessons} lessons
 						</span>
 					</div>
-					<div className="bg-gray-200 h-2.5 w-full rounded-full">
+					<div className="bg-gray-100 h-4 w-full overflow-hidden rounded-full">
 						<div
-							className="h-2.5 rounded-full bg-green-600 transition-all duration-500"
+							className="h-4 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
 							style={{ width: `${progress.progressPercentage}%` }}
 						/>
 					</div>
 					{progress.isCompleted && course.badge && (
-						<div className="mt-2 text-center text-sm text-green-600">
-							🎉 Course Completed! You&apos;ve earned the{" "}
-							{course.badge.name} badge!
+						<div className="mt-4 animate-bounce text-center">
+							<span className="text-lg">🎉</span>
+							<span className="ml-2 text-sm font-medium text-[var(--color-primary)]">
+								Congratulations! You've earned the{" "}
+								{course.badge.name} badge!
+							</span>
 						</div>
 					)}
 				</div>
@@ -322,21 +354,21 @@ const CourseDetailsPage = () => {
 						onClick={() =>
 							navigate(`/admin/edit-course/${course.id}`)
 						}
-						className="rounded bg-yellow-500 px-4 py-2 font-bold text-white hover:bg-yellow-600"
+						className="transform rounded-lg bg-yellow-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-yellow-600 hover:shadow-lg"
 						type="button"
 					>
 						✏️ Edit Course
 					</button>
 					<button
 						onClick={handleDelete}
-						className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-600"
+						className="transform rounded-lg bg-red-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-red-600 hover:shadow-lg"
 						type="button"
 					>
 						🗑️ Delete
 					</button>
 					<button
 						onClick={() => handlePublishToggle(!course.isPublished)}
-						className={publishButtonClassName}
+						className={`transform rounded-lg ${publishButtonClassName} shadow transition-all hover:-translate-y-1 hover:shadow-lg`}
 						type="button"
 					>
 						{course.isPublished ? "🚫 Unpublish" : "📢 Publish"}
@@ -347,7 +379,7 @@ const CourseDetailsPage = () => {
 								`/admin/create-lesson?courseId=${course.id}`,
 							)
 						}
-						className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
+						className="transform rounded-lg bg-[var(--color-accent)] px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-[#5658ac] hover:shadow-lg"
 						type="button"
 					>
 						➕ Add Lesson
@@ -355,12 +387,15 @@ const CourseDetailsPage = () => {
 				</div>
 			)}
 
-			<h2 className="mb-6 text-center text-2xl font-semibold text-[var(--color-primary)]">
-				Lessons in this course
+			<h2 className="mb-6 text-center text-2xl font-semibold">
+				<span className="mr-2">📚</span>
+				Lessons in this Course
 			</h2>
 
 			{lessons.length === 0 ? (
-				<p className="text-gray-500 text-center">No lessons yet.</p>
+				<p className="text-gray-500 text-center">
+					No lessons available yet.
+				</p>
 			) : (
 				<div className="mx-auto max-w-2xl">
 					<DragDropContext onDragEnd={handleDragEnd}>

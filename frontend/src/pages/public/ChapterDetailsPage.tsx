@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import api from "../../utils/api";
 import { motion } from "framer-motion";
-import { BookText, Plus, ArrowLeft, CheckCircle } from "lucide-react";
+import { Plus, ArrowLeft, CheckCircle } from "lucide-react";
 
 interface ChapterElement {
 	id: string;
@@ -82,8 +82,44 @@ export default function ChapterDetailsPage() {
 		}
 	};
 
+	const checkQuizCompletions = async () => {
+		const quizElements = elements.filter(
+			(element) => element.type === "Form" && element.formId,
+		);
+		if (quizElements.length === 0) return true;
+
+		try {
+			const quizCompletions = await Promise.all(
+				quizElements.map(async (element) => {
+					if (!element.formId) return false;
+					try {
+						const response = await api.get(
+							`/QuizSubmission/check/${element.formId}`,
+						);
+						return response.data.passed;
+					} catch {
+						return false;
+					}
+				}),
+			);
+
+			return quizCompletions.every((completed) => completed);
+		} catch (error) {
+			console.error("Error checking quiz completions:", error);
+			return false;
+		}
+	};
+
 	const handleComplete = async () => {
 		try {
+			const quizzesCompleted = await checkQuizCompletions();
+			if (!quizzesCompleted) {
+				toast.error(
+					"You must complete all quizzes in this chapter before marking it as complete!",
+				);
+				return;
+			}
+
 			await api.post(`/userprogress/chapter/${chapterId}/complete`);
 			toast.success("Chapter completed! 🌟");
 			setChapterProgress((prev) => ({ ...prev, isCompleted: true }));
@@ -150,14 +186,14 @@ export default function ChapterDetailsPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white">
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 				<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--color-primary)]" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#f4fff7] to-white px-6 py-10">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
 			<div className="mx-auto max-w-4xl">
 				{/* Breadcrumb navigation */}
 				<div className="text-gray-600 mb-4 flex items-center gap-2 text-sm">
@@ -165,22 +201,24 @@ export default function ChapterDetailsPage() {
 						<>
 							<button
 								onClick={() => navigate(`/course/${courseId}`)}
-								className="transition-colors hover:text-[var(--color-primary)]"
+								className="transition-colors hover:text-white"
+								type="button"
 							>
 								{courseTitle}
 							</button>
-							<span>/</span>
+							<span>🚀</span>
 						</>
 					)}
 					{lessonId && (
 						<>
 							<button
 								onClick={() => navigate(`/lesson/${lessonId}`)}
-								className="transition-colors hover:text-[var(--color-primary)]"
+								className="transition-colors hover:text-white"
+								type="button"
 							>
 								{lessonTitle}
 							</button>
-							<span>/</span>
+							<span>📖</span>
 						</>
 					)}
 					<span className="text-[var(--color-primary)]">
@@ -194,14 +232,28 @@ export default function ChapterDetailsPage() {
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 				>
-					<BookText className="mb-4 h-12 w-12 text-[var(--color-primary)]" />
-					<h1 className="text-4xl font-extrabold text-[var(--color-primary)]">
+					<div className="relative">
+						<img
+							src="/src/assets/code_icon_green.svg"
+							alt="Code icon"
+							className="mb-4 h-16 w-16"
+						/>
+						<motion.div
+							className="absolute -right-2 -top-2"
+							animate={{ y: [-4, 4, -4] }}
+							transition={{ repeat: Infinity, duration: 2 }}
+						>
+							✨
+						</motion.div>
+					</div>
+					<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
 						{chapterTitle}
 					</h1>
 					<div className="mt-4 flex flex-wrap justify-center gap-4">
 						<button
 							onClick={() => navigate(`/lesson/${lessonId}`)}
-							className="bg-gray-500 hover:bg-gray-600 flex items-center gap-2 rounded-xl px-4 py-2 text-white"
+							className="flex transform items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+							type="button"
 						>
 							<ArrowLeft size={16} /> Back to Lesson
 						</button>
@@ -212,7 +264,8 @@ export default function ChapterDetailsPage() {
 										`/admin/chapter/${chapterId}/add-element`,
 									)
 								}
-								className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+								className="flex transform items-center gap-2 rounded-xl bg-[var(--color-accent)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+								type="button"
 							>
 								<Plus size={16} /> Add Element
 							</button>
@@ -231,7 +284,7 @@ export default function ChapterDetailsPage() {
 							>
 								{elements.length === 0 ? (
 									<p className="text-gray-500 text-center">
-										No elements yet in this chapter.
+										No elements in this chapter yet.
 									</p>
 								) : (
 									elements.map((element, index) => (
@@ -246,16 +299,39 @@ export default function ChapterDetailsPage() {
 													ref={provided.innerRef}
 													{...provided.draggableProps}
 													{...provided.dragHandleProps}
-													className="rounded-2xl border bg-white p-6 shadow-md transition-all hover:shadow-xl"
+													className="transform rounded-2xl border bg-white p-6 shadow-md transition-all hover:shadow-xl"
 												>
-													<div className="mb-4 flex items-center justify-between">
+													<motion.div
+														className="mb-4 flex items-center justify-between"
+														initial={
+															!isAdmin
+																? {
+																		opacity: 0,
+																		x: -20,
+																	}
+																: false
+														}
+														animate={{
+															opacity: 1,
+															x: 0,
+														}}
+														transition={{
+															delay: index * 0.1,
+														}}
+													>
 														<div className="flex items-center gap-4">
-															<div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-primary)] text-white">
-																{index + 1}
-															</div>
-															<h2 className="text-xl font-bold">
-																{element.title}
-															</h2>
+															{!isAdmin && (
+																<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] text-lg font-bold text-white">
+																	{index + 1}
+																</div>
+															)}
+															{isAdmin && (
+																<h2 className="bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] bg-clip-text text-2xl font-bold text-transparent">
+																	{
+																		element.title
+																	}
+																</h2>
+															)}
 														</div>
 														{isAdmin && (
 															<div className="flex gap-2">
@@ -265,9 +341,10 @@ export default function ChapterDetailsPage() {
 																			element.id,
 																		)
 																	}
-																	className="rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600"
+																	className="transform rounded-lg bg-yellow-500 px-3 py-1 text-white shadow transition-all hover:-translate-y-1 hover:shadow-md"
+																	type="button"
 																>
-																	✏️ Edit
+																	Edit
 																</button>
 																<button
 																	onClick={() =>
@@ -275,71 +352,131 @@ export default function ChapterDetailsPage() {
 																			element.id,
 																		)
 																	}
-																	className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
+																	className="transform rounded-lg bg-red-500 px-3 py-1 text-white shadow transition-all hover:-translate-y-1 hover:shadow-md"
+																	type="button"
 																>
-																	🗑️ Delete
+																	Delete
 																</button>
 															</div>
 														)}
-													</div>
+													</motion.div>
 
-													{/* Render different content types */}
-													{element.type === "Image" &&
-														element.image && (
-															<img
-																src={
-																	element.image
-																}
-																alt={
-																	element.title
-																}
-																className="rounded-lg"
-															/>
-														)}
-													{element.type ===
-														"CodeFragment" &&
-														element.content && (
-															<pre className="bg-gray-50 overflow-x-auto rounded-lg p-4">
-																<code className="font-mono text-sm">
-																	{
-																		element.content
+													{/* Element content with improved styling */}
+													<motion.div
+														initial={
+															!isAdmin
+																? {
+																		opacity: 0,
+																		y: 20,
 																	}
-																</code>
-															</pre>
-														)}
-													{element.type === "Form" &&
-														element.formId && (
-															<div className="rounded-lg bg-blue-50 p-4">
-																<p className="mb-4 text-blue-700">
-																	Test your
-																	knowledge!
-																</p>
-																<button
-																	onClick={() =>
-																		navigate(
-																			`/quiz/${element.formId}`,
-																		)
-																	}
-																	className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-																>
-																	Start Quiz
-																</button>
-															</div>
-														)}
-													{element.type !== "Image" &&
-														element.type !==
+																: false
+														}
+														animate={{
+															opacity: 1,
+															y: 0,
+														}}
+														transition={{
+															delay:
+																index * 0.1 +
+																0.2,
+														}}
+													>
+														{element.type ===
+															"Image" &&
+															element.image && (
+																<div className="flex justify-center">
+																	<img
+																		src={
+																			element.image
+																		}
+																		alt={
+																			element.title
+																		}
+																		className="max-h-[600px] w-auto transform rounded-lg object-contain transition-transform hover:scale-105"
+																	/>
+																</div>
+															)}
+														{element.type ===
 															"CodeFragment" &&
-														element.type !==
+															element.content && (
+																<pre className="bg-gray-900 relative overflow-x-auto rounded-lg p-4 font-mono text-sm shadow-lg">
+																	<div className="mb-2 flex gap-2">
+																		<div className="h-3 w-3 rounded-full bg-red-500"></div>
+																		<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+																		<div className="h-3 w-3 rounded-full bg-green-500"></div>
+																	</div>
+																	<code>
+																		{
+																			element.content
+																		}
+																	</code>
+																</pre>
+															)}
+														{element.type ===
 															"Form" &&
-														element.content && (
-															<div className="prose max-w-none">
-																<p>
-																	{
-																		element.content
-																	}
-																</p>
-															</div>
-														)}
+															element.formId && (
+																<div className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner">
+																	<div className="mb-4 flex items-center gap-3">
+																		<span className="text-2xl">
+																			🎯
+																		</span>
+																		<h3 className="text-xl font-semibold text-blue-800">
+																			Test
+																			Your
+																			Knowledge!
+																		</h3>
+																	</div>
+																	{!isAdmin && (
+																		<p className="mb-4 text-blue-700">
+																			Time
+																			to
+																			check
+																			your
+																			understanding
+																			with
+																			a
+																			quick
+																			quiz.
+																		</p>
+																	)}
+																	{!isAdmin && (
+																		<button
+																			onClick={() =>
+																				navigate(
+																					`/quiz/${element.formId}`,
+																				)
+																			}
+																			className="flex transform items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
+																			type="button"
+																		>
+																			<span>
+																				Start
+																				Quiz
+																			</span>
+																			<span className="text-xl">
+																				🚀
+																			</span>
+																		</button>
+																	)}
+																</div>
+															)}
+
+														{element.type !==
+															"Image" &&
+															element.type !==
+																"CodeFragment" &&
+															element.type !==
+																"Form" &&
+															element.content && (
+																<div className="prose bg-gray-50 max-w-none rounded-lg p-6 leading-relaxed">
+																	<p className="text-lg">
+																		{
+																			element.content
+																		}
+																	</p>
+																</div>
+															)}
+													</motion.div>
 												</div>
 											)}
 										</Draggable>
@@ -353,22 +490,32 @@ export default function ChapterDetailsPage() {
 
 				{/* Chapter completion section for students */}
 				{!isAdmin && elements.length > 0 && (
-					<div className="mt-10 flex justify-end">
+					<motion.div
+						className="mt-10 flex justify-end"
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.5 }}
+					>
 						{!chapterProgress?.isCompleted ? (
 							<button
 								onClick={handleComplete}
-								className="flex items-center gap-2 rounded-xl bg-green-600 px-6 py-3 font-bold text-white hover:bg-green-700"
+								className="flex transform items-center gap-2 rounded-xl bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+								type="button"
 							>
 								<CheckCircle size={20} />
-								Mark Chapter as Completed
+								Mark Chapter as Complete
 							</button>
 						) : (
-							<div className="flex items-center gap-2 rounded-xl bg-green-100 px-6 py-3 text-green-800">
+							<motion.div
+								className="flex items-center gap-2 rounded-xl bg-green-100 px-6 py-3 text-green-800"
+								animate={{ scale: [1, 1.05, 1] }}
+								transition={{ duration: 0.5 }}
+							>
 								<CheckCircle size={20} />
-								Chapter Completed!
-							</div>
+								Chapter Completed! 🎉
+							</motion.div>
 						)}
-					</div>
+					</motion.div>
 				)}
 			</div>
 		</div>

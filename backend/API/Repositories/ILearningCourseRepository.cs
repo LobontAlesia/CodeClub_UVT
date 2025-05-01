@@ -1,4 +1,5 @@
 ﻿using API.Entities;
+using API.Models;
 
 namespace API.Repositories;
 
@@ -10,4 +11,5 @@ public interface ILearningCourseRepository : IBaseRepository<LearningCourse>
     Task<bool> ExistsWithBadgeAsync(Guid badgeId, Guid excludeCourseId);
     Task<bool> ExistsWithBadgeIconAsync(string icon);
     Task<bool> ExistsWithBadgeIconAsync(string icon, Guid excludeCourseId);
+    Task ReorderCoursesAsync(List<ReorderCourseDto> courses);
 }

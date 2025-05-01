@@ -5,7 +5,7 @@ import axios from "axios";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Medal, BookOpen, Wrench, X } from "lucide-react";
+import { Medal, BookOpen, Wrench, X } from "lucide-react";
 
 interface JwtPayload {
 	roles: string;
@@ -80,9 +80,13 @@ const DashboardPage = () => {
 				]);
 
 			// Filter only published courses and count them
-			const publishedCourses = progressResponse.data.filter((c: any) => c.isPublished);
+			const publishedCourses = progressResponse.data.filter(
+				(c: any) => c.isPublished,
+			);
 			const totalCourses = publishedCourses.length;
-			const completedCourses = publishedCourses.filter((c: any) => c.completed).length;
+			const completedCourses = publishedCourses.filter(
+				(c: any) => c.completed,
+			).length;
 
 			setProgress({
 				totalCourses,
@@ -106,6 +110,17 @@ const DashboardPage = () => {
 		setSelectedBadge(null);
 	};
 
+	const displayBadgeIcon = (badge: Badge) => {
+		if (!badge.icon) return "";
+
+		// If the icon contains data:image somewhere, extract everything from that point
+		if (badge.icon.includes("data:image")) {
+			return badge.icon.substring(badge.icon.indexOf("data:image"));
+		}
+
+		return badge.icon;
+	};
+
 	const progressPercentage =
 		progress.totalCourses > 0
 			? Math.round(
@@ -115,7 +130,7 @@ const DashboardPage = () => {
 
 	if (loading) {
 		return (
-			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e5f7de] to-white">
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 				<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--color-primary)]" />
 			</div>
 		);
@@ -128,7 +143,11 @@ const DashboardPage = () => {
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
 			>
-				<Sparkles className="mb-4 h-12 w-12 text-[var(--color-primary)]" />
+				<img
+					src="/src/assets/bracket-icons-heart.svg"
+					alt="Heart icon"
+					className="mb-4 h-16 w-16"
+				/>
 				<h1 className="text-5xl font-extrabold text-[var(--color-primary)]">
 					Welcome back, {name}!
 				</h1>
@@ -212,9 +231,9 @@ const DashboardPage = () => {
 									tabIndex={0}
 								>
 									<img
-										src={badge.icon}
+										src={displayBadgeIcon(badge)}
 										alt={badge.name}
-										className="h-16 w-16 rounded-full shadow-sm transition-transform hover:scale-110 cursor-pointer"
+										className="h-16 w-16 cursor-pointer rounded-full shadow-sm transition-transform hover:scale-110"
 									/>
 									<span className="mt-1 text-sm font-medium">
 										{badge.name}
@@ -264,13 +283,13 @@ const DashboardPage = () => {
 							onClick={() => navigate("/admin/create-course")}
 							className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
 						>
-							 ➕ Create Course
+							➕ Create Course
 						</button>
 						<button
 							onClick={() => navigate("/admin/create-badge")}
 							className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
 						>
-							 🏅 Create Badge
+							🏅 Create Badge
 						</button>
 					</div>
 				</motion.section>
@@ -283,7 +302,7 @@ const DashboardPage = () => {
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						onClick={closeBadgeModal}
-						className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30 p-4"
+						className="bg-white/30 fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
 					>
 						<motion.div
 							initial={{ scale: 0.5 }}
@@ -294,19 +313,19 @@ const DashboardPage = () => {
 						>
 							<button
 								onClick={closeBadgeModal}
-								className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+								className="bg-gray-500 hover:bg-gray-600 absolute right-2 top-2 p-1"
 							>
-								<X size={24} />
+								<X size={16} className="text-white" />
 							</button>
 							<img
-								src={selectedBadge.icon}
+								src={displayBadgeIcon(selectedBadge)}
 								alt={selectedBadge.name}
 								className="h-48 w-48 rounded-lg"
 							/>
 							<h3 className="mt-4 text-center text-xl font-bold">
 								{selectedBadge.name}
 							</h3>
-							<p className="text-center text-gray-600">
+							<p className="text-gray-600 text-center">
 								{selectedBadge.level}
 							</p>
 						</motion.div>

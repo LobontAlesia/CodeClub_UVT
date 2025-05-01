@@ -73,4 +73,19 @@ public class LearningCourseController(
         await learningCourseRepository.DeleteAsync(course);
         return Ok();
     }
+
+    [HttpPut("reorder")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ReorderCourses([FromBody] ReorderCoursesRequest request)
+    {
+        try
+        {
+            await learningCourseRepository.ReorderCoursesAsync(request.Courses);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Error reordering courses", error = ex.Message });
+        }
+    }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using API.Constants;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace API.Controllers
 {
@@ -17,6 +18,8 @@ namespace API.Controllers
         PostgresDbContext dbContext
     ) : ControllerBase
     {
+        private static readonly ConcurrentDictionary<string, List<string>> _imageChunks = new();
+
         [HttpPost("chapter/{chapterId}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> CreateElement([FromRoute] Guid chapterId, [FromBody] ChapterElementModel model)
@@ -27,13 +30,12 @@ namespace API.Controllers
                 if (chapter == null)
                     return NotFound("Chapter not found");
 
-                // Get max index from existing elements
                 var maxIndex = chapter.Elements.Any() ? chapter.Elements.Max(e => e.Index) : 0;
 
                 var element = new ChapterElement
                 {
                     Id = Guid.NewGuid(),
-                    Index = maxIndex + 1, // Set index automatically
+                    Index = maxIndex + 1,
                     Title = model.Title,
                     Type = model.Type,
                     Content = model.Content,
@@ -42,7 +44,6 @@ namespace API.Controllers
                     ChapterId = chapterId
                 };
 
-                // Create the element first
                 var savedElement = await chapterElementRepository.CreateAsync(element);
                 if (savedElement == null)
                 {
@@ -54,6 +55,55 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error creating element: {ex.Message}");
+            }
+        }
+
+        [HttpPost("chapter/{chapterId}/chunk")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> CreateElementChunk([FromRoute] Guid chapterId, [FromBody] ChapterElementChunkModel model)
+        {
+            try
+            {
+                if (!model.IsChunk || model.ChunkIndex >= model.TotalChunks)
+                    return BadRequest("Invalid chunk data");
+
+                var chunkKey = $"{chapterId}_{model.Title}_{DateTime.UtcNow:yyyyMMdd}";
+                var chunks = _imageChunks.GetOrAdd(chunkKey, _ => new List<string>());
+
+                // Add this chunk
+                chunks.Add(model.Image);
+
+                // If we have all chunks, create the element
+                if (chunks.Count == model.TotalChunks)
+                {
+                    var completeImage = string.Concat(chunks);
+                    var element = new ChapterElement
+                    {
+                        Id = Guid.NewGuid(),
+                        Index = model.Index,
+                        Title = model.Title,
+                        Type = model.Type,
+                        Image = completeImage,
+                        ChapterId = chapterId
+                    };
+
+                    var savedElement = await chapterElementRepository.CreateAsync(element);
+                    if (savedElement == null)
+                    {
+                        return StatusCode(500, "Failed to create element");
+                    }
+
+                    // Clean up chunks
+                    _imageChunks.TryRemove(chunkKey, out _);
+
+                    return Ok(element.Id);
+                }
+
+                return Ok(new { message = $"Chunk {model.ChunkIndex + 1} of {model.TotalChunks} received" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error processing chunk: {ex.Message}");
             }
         }
 
@@ -85,6 +135,51 @@ namespace API.Controllers
             return Ok();
         }
 
+        [HttpPut("{elementId}/chunk")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UpdateElementChunk([FromRoute] Guid elementId, [FromBody] ChapterElementChunkModel model)
+        {
+            try
+            {
+                if (!model.IsChunk || model.ChunkIndex >= model.TotalChunks)
+                    return BadRequest("Invalid chunk data");
+
+                var chunkKey = $"{elementId}_{model.Title}_{DateTime.UtcNow:yyyyMMdd}";
+                var chunks = _imageChunks.GetOrAdd(chunkKey, _ => new List<string>());
+
+                // Add this chunk
+                chunks.Add(model.Image);
+
+                // If we have all chunks, update the element
+                if (chunks.Count == model.TotalChunks)
+                {
+                    var element = await chapterElementRepository.GetByIdAsync(elementId);
+                    if (element == null)
+                        return NotFound("Element not found");
+
+                    var completeImage = string.Concat(chunks);
+                    element.Title = model.Title;
+                    element.Type = model.Type;
+                    element.Image = completeImage;
+                    element.Index = model.Index;
+                    element.FormId = model.FormId;
+
+                    await chapterElementRepository.UpdateAsync(element);
+
+                    // Clean up chunks
+                    _imageChunks.TryRemove(chunkKey, out _);
+
+                    return Ok();
+                }
+
+                return Ok(new { message = $"Chunk {model.ChunkIndex + 1} of {model.TotalChunks} received" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error processing chunk: {ex.Message}");
+            }
+        }
+
         [HttpDelete("{elementId}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteElement([FromRoute] Guid elementId)
@@ -95,7 +190,6 @@ namespace API.Controllers
                 if (element == null)
                     return NotFound("Element not found");
 
-                // Delete associated quiz form if this is a form element
                 if (element.Type == ChapterElementTypes.Form && element.FormId.HasValue)
                 {
                     var quizForm = await quizFormRepository.GetByIdWithQuestionsAsync(element.FormId.Value);

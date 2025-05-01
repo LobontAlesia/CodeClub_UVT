@@ -5,28 +5,29 @@ namespace API.Mappers;
 
 public static class LearningCourseMapper
 {
-    public static LearningCourse MapLearningCourseInputModelToLearningCourse(
-        LearningCourseInputModel learningCourseInputModel) =>
-        new LearningCourse
+    public static LearningCourse MapLearningCourseInputModelToLearningCourse(LearningCourseInputModel model) =>
+        new()
         {
-            Title = learningCourseInputModel.Title,
-            Description = learningCourseInputModel.Description,
-            Duration = learningCourseInputModel.Duration,
-            BaseName = learningCourseInputModel.BaseName,
-            Level = learningCourseInputModel.Level,
+            Id = Guid.NewGuid(),
+            Title = model.Title,
+            Description = model.Description,
+            BaseName = model.BaseName,
+            Level = model.Level,
+            Duration = model.Duration,
+            BadgeId = model.BadgeId,
             IsPublished = false
         };
 
-    public static LearningCourseModel MapLearningCourseEntityToLearningCourseModel(LearningCourse learningCourse) =>
-        new LearningCourseModel
+    public static LearningCourseModel MapLearningCourseEntityToLearningCourseModel(LearningCourse course) =>
+        new()
         {
-            Id = learningCourse.Id,
-            Title = learningCourse.Title,
-            Description = learningCourse.Description,
-            Duration = learningCourse.Duration,
-            Level = learningCourse.Level,
-            IsPublished = learningCourse.IsPublished,
-            TagNames = learningCourse.Tags.Select(t => t.Name).ToList()
+            Id = course.Id,
+            Title = course.Title,
+            Description = course.Description,
+            Level = course.Level,
+            Duration = course.Duration,
+            IsPublished = course.IsPublished,
+            TagNames = course.Tags?.Select(t => t.Name).ToList() ?? []
         };
 
     public static LearningCourse MapLearningCoursePatchModelToLearningCourseEntity(LearningCoursePatchModel learningCoursePatchModel) =>

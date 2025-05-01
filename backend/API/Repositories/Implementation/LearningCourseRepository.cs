@@ -1,4 +1,5 @@
 ﻿using API.Entities;
+using API.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories.Implementation;
@@ -15,6 +16,7 @@ public class LearningCourseRepository : BaseRepository<LearningCourse>, ILearnin
     public async Task<List<LearningCourse>> GetAllAsync() =>
         await _context.LearningCourses
             .Include(lr => lr.Tags)
+            .OrderBy(c => c.Index)
             .ToListAsync();
 
     public async Task<LearningCourse?> GetByIdAsync(Guid id) =>
@@ -26,14 +28,12 @@ public class LearningCourseRepository : BaseRepository<LearningCourse>, ILearnin
 
     public async Task<bool> ExistsWithBadgeAsync(Guid badgeId)
     {
-        return await _context.LearningCourses
-            .AnyAsync(lc => lc.BadgeId == badgeId);
+        return await _context.LearningCourses.AnyAsync(lc => lc.BadgeId == badgeId);
     }
 
     public async Task<bool> ExistsWithBadgeAsync(Guid badgeId, Guid excludeCourseId)
     {
-        return await _context.LearningCourses
-            .AnyAsync(lc => lc.BadgeId == badgeId && lc.Id != excludeCourseId);
+        return await _context.LearningCourses.AnyAsync(lc => lc.BadgeId == badgeId && lc.Id != excludeCourseId);
     }
 
     public async Task<bool> ExistsWithBadgeIconAsync(string icon)
@@ -47,6 +47,22 @@ public class LearningCourseRepository : BaseRepository<LearningCourse>, ILearnin
     {
         return await _context.LearningCourses
             .Include(lc => lc.Badge)
-            .AnyAsync(lc => lc.Badge != null && lc.Badge.Icon == icon && lc.Id != excludeCourseId);
+            .AnyAsync(lc => lc.Id != excludeCourseId && lc.Badge != null && lc.Badge.Icon == icon);
+    }
+
+    public async Task ReorderCoursesAsync(List<ReorderCourseDto> courses)
+    {
+        var existingCourses = await _context.LearningCourses.ToListAsync();
+
+        foreach (var course in existingCourses)
+        {
+            var found = courses.FirstOrDefault(x => x.Id == course.Id.ToString());
+            if (found != null)
+            {
+                course.Index = found.Index;
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 }

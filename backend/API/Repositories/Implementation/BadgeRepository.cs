@@ -17,4 +17,7 @@ public class BadgeRepository : BaseRepository<Badge>, IBadgeRepository
 
     public async Task<Badge?> GetByBaseNameAndLevelAsync(string baseName, string level) =>
         await _context.Set<Badge>().FirstOrDefaultAsync(b => b.BaseName.Equals(baseName.ToLower()) && b.Level.Equals(level));
+
+    public async Task<Badge?> GetByIdAsync(Guid id) =>
+        await _context.Set<Badge>().FindAsync(id);
 }

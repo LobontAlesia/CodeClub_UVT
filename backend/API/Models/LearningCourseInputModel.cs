@@ -8,6 +8,5 @@ public class LearningCourseInputModel
     public string BaseName { get; init; } = string.Empty;
     public string Level { get; init; } = string.Empty;
     public List<string> TagNames { get; init; } = [];
-    
-    public string BadgeName { get; init; } = string.Empty; 
+    public Guid BadgeId { get; init; }
 }

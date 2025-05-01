@@ -10,6 +10,7 @@ interface Badge {
 	baseName: string;
 	level: string;
 	icon: string;
+	id: string;
 }
 
 interface Course {
@@ -23,6 +24,7 @@ interface Course {
 	tagNames: string[];
 	badge?: {
 		name: string;
+		id: string;
 	};
 }
 
@@ -31,10 +33,9 @@ const CreateCoursePage = () => {
 	const [description, setDescription] = useState("");
 	const [baseName, setBaseName] = useState("");
 	const [level, setLevel] = useState("");
-	const [badgeName, setBadgeName] = useState(""); // ✅ adăugat
+	const [selectedBadgeId, setSelectedBadgeId] = useState("");
 	const [duration, setDuration] = useState(1);
-	const [badges, setBadges] = useState<Badge[]>([]);
-	const [courses, setCourses] = useState<Course[]>([]);
+	const [availableBadges, setAvailableBadges] = useState<Badge[]>([]);
 	const [tags, setTags] = useState<string[]>([]);
 	const [newTag, setNewTag] = useState("");
 
@@ -45,15 +46,29 @@ const CreateCoursePage = () => {
 			try {
 				const token = localStorage.getItem("token");
 				const headers = { Authorization: `Bearer ${token}` };
+
 				const [badgesRes, coursesRes] = await Promise.all([
 					axios.get("http://localhost:5153/Badge", { headers }),
 					axios.get("http://localhost:5153/LearningCourse", {
 						headers,
 					}),
 				]);
-				setBadges(badgesRes.data);
-				setCourses(coursesRes.data);
+
+				const allBadges: Badge[] = badgesRes.data;
+				const allCourses: Course[] = coursesRes.data;
+
+				// Filter out badges that are already used in courses
+				const usedBadgeIds = allCourses
+					.map((c) => c.badge?.id)
+					.filter(Boolean);
+
+				const filteredBadges = allBadges.filter(
+					(b) => !usedBadgeIds.includes(b.id),
+				);
+
+				setAvailableBadges(filteredBadges);
 			} catch (error) {
+				console.error(error);
 				toast.error("Failed to load badges or courses");
 			}
 		};
@@ -64,7 +79,7 @@ const CreateCoursePage = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		if (!baseName || !level || !badgeName) {
+		if (!selectedBadgeId) {
 			toast.error("Please select a badge");
 			return;
 		}
@@ -82,7 +97,7 @@ const CreateCoursePage = () => {
 					level,
 					duration,
 					tagNames: tags,
-					BadgeName: badgeName
+					badgeId: selectedBadgeId,
 				},
 				{ headers },
 			);
@@ -153,26 +168,32 @@ const CreateCoursePage = () => {
 				<div>
 					<label className="font-semibold">Badge</label>
 					<select
+						value={selectedBadgeId}
 						onChange={(e) => {
-							const selected = badges.find(
-								(b) => b.name === e.target.value,
+							const selected = availableBadges.find(
+								(b) => b.id === e.target.value,
 							);
 							if (selected) {
 								setBaseName(selected.baseName);
 								setLevel(selected.level);
-								setBadgeName(selected.name); // ✅ adăugat
+								setSelectedBadgeId(selected.id);
 							}
 						}}
 						required
 						className="w-full rounded border p-2"
 					>
 						<option value="">Select a badge</option>
-						{badges.map((badge, idx) => (
-							<option key={idx} value={badge.name}>
+						{availableBadges.map((badge) => (
+							<option key={badge.id} value={badge.id}>
 								{badge.name} ({badge.level})
 							</option>
 						))}
 					</select>
+					{availableBadges.length === 0 && (
+						<p className="mt-2 text-sm text-red-500">
+							All badges are already assigned to courses.
+						</p>
+					)}
 				</div>
 
 				<div>
@@ -217,7 +238,7 @@ const CreateCoursePage = () => {
 						type="submit"
 						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
 					>
-						 ➕ Create Course
+						➕ Create Course
 					</button>
 				</div>
 			</form>

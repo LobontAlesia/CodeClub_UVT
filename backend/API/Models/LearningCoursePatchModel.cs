@@ -11,6 +11,5 @@ public class LearningCoursePatchModel
     public string Level { get; set; } = string.Empty;
     public int Duration { get; set; }
     public string BaseName { get; set; } = string.Empty;
-    public string BadgeName { get; set; } = string.Empty;
-
+    public Guid? BadgeId { get; set; }
 }

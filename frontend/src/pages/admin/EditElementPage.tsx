@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import FormCard from "../../components/FormCard";
 import { FileEdit } from "lucide-react";
 
+const CHUNK_SIZE = 500000; // 500KB chunks
+
 interface ChapterElement {
 	id: string;
 	title: string;
@@ -23,6 +25,7 @@ export default function EditElementPage() {
 	const [title, setTitle] = useState("");
 	const [content, setContent] = useState("");
 	const [image, setImage] = useState("");
+	const [previewImage, setPreviewImage] = useState<string | null>(null);
 
 	useEffect(() => {
 		fetchElement();
@@ -40,9 +43,61 @@ export default function EditElementPage() {
 			setTitle(res.data.title);
 			setContent(res.data.content || "");
 			setImage(res.data.image || "");
+			setPreviewImage(res.data.image || null);
 		} catch (error) {
 			console.error("Error loading element", error);
 			toast.error("Failed to load element");
+		}
+	};
+
+	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (file) {
+			if (file.size > 5000000) {
+				// 5MB limit
+				toast.error("Image size should be less than 5MB");
+				return;
+			}
+
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				const base64String = reader.result as string;
+				setPreviewImage(base64String);
+
+				// Compress image if it's too large
+				const img = new Image();
+				img.src = base64String;
+				img.onload = () => {
+					const canvas = document.createElement("canvas");
+					const ctx = canvas.getContext("2d")!;
+
+					// Calculate new dimensions while maintaining aspect ratio
+					let width = img.width;
+					let height = img.height;
+					const maxSize = 800;
+
+					if (width > height && width > maxSize) {
+						height *= maxSize / width;
+						width = maxSize;
+					} else if (height > maxSize) {
+						width *= maxSize / height;
+						height = maxSize;
+					}
+
+					canvas.width = width;
+					canvas.height = height;
+
+					// Draw and compress
+					ctx.drawImage(img, 0, 0, width, height);
+					const compressedBase64 = canvas.toDataURL(
+						"image/jpeg",
+						0.6,
+					);
+
+					setImage(compressedBase64);
+				};
+			};
+			reader.readAsDataURL(file);
 		}
 	};
 
@@ -51,16 +106,54 @@ export default function EditElementPage() {
 			const token = localStorage.getItem("token");
 			const headers = { Authorization: `Bearer ${token}` };
 
+			const payload = {
+				title,
+				content,
+				image,
+				type: element?.type,
+				index: element?.index,
+				formId: element?.formId || null,
+			};
+
+			// Split large requests into chunks if needed
+			if (
+				JSON.stringify(payload).length > CHUNK_SIZE &&
+				element?.type === "Image"
+			) {
+				const chunks = Math.ceil(image.length / CHUNK_SIZE);
+				const imageChunks = [];
+
+				for (let i = 0; i < chunks; i++) {
+					imageChunks.push(
+						image.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE),
+					);
+				}
+
+				// Send each chunk
+				for (let i = 0; i < chunks; i++) {
+					const chunkPayload = {
+						...payload,
+						image: imageChunks[i],
+						isChunk: true,
+						chunkIndex: i,
+						totalChunks: chunks,
+					};
+
+					await axios.put(
+						`http://localhost:5153/chapterelement/${elementId}/chunk`,
+						chunkPayload,
+						{ headers },
+					);
+				}
+
+				toast.success("Element updated successfully!");
+				navigate(-1);
+				return;
+			}
+
 			await axios.put(
 				`http://localhost:5153/chapterelement/${elementId}`,
-				{
-					title,
-					content,
-					image,
-					type: element?.type,
-					index: element?.index,
-					formId: element?.formId || null,
-				},
+				payload,
 				{ headers },
 			);
 
@@ -148,23 +241,25 @@ export default function EditElementPage() {
 				{element.type === "Image" && (
 					<div>
 						<label className="mb-1 block font-semibold">
-							Image URL
+							Image
 						</label>
 						<input
-							type="text"
-							value={image}
-							onChange={(e) => setImage(e.target.value)}
-							className="w-full rounded border p-2"
+							type="file"
+							accept="image/*"
+							onChange={handleImageUpload}
+							className="w-full text-sm"
 						/>
-						{image && (
-							<img
-								src={image}
-								alt="Preview"
-								className="mt-2 max-w-md rounded"
-								onError={(e) =>
-									(e.currentTarget.style.display = "none")
-								}
-							/>
+						{previewImage && (
+							<div className="mt-4 flex justify-center">
+								<img
+									src={previewImage}
+									alt="Preview"
+									className="mt-2 max-w-md rounded shadow-md"
+									onError={(e) =>
+										(e.currentTarget.style.display = "none")
+									}
+								/>
+							</div>
 						)}
 					</div>
 				)}
@@ -180,7 +275,7 @@ export default function EditElementPage() {
 						onClick={handleSave}
 						className="flex-1 rounded bg-yellow-500 py-2 font-semibold text-white hover:bg-yellow-600"
 					>
-						✏️ Save Changes
+						Save Changes
 					</button>
 				</div>
 			</div>

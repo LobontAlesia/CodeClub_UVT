@@ -19,9 +19,9 @@ const CreateBadgePage = () => {
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const base64String = reader.result as string;
-				 // Salvăm imaginea originală pentru preview
+				// Salvăm imaginea originală pentru preview
 				setOriginalIcon(base64String);
-				
+
 				// Generăm identificatorul unic și salvăm imaginea modificată pentru trimitere
 				const timestamp = new Date().getTime();
 				const uniqueIdentifier = `${timestamp}-${Math.random().toString(36).substring(7)}`;
@@ -129,7 +129,7 @@ const CreateBadgePage = () => {
 					/>
 				</div>
 
-				 {originalIcon && (
+				{originalIcon && (
 					<div className="mt-4 flex justify-center">
 						<img
 							src={originalIcon}

@@ -61,7 +61,7 @@ export function RegisterPage() {
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-background)] p-4">
+		<div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 			<img src={logo} alt="CodeClub Logo" className="mb-8 h-40" />
 
 			<div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-xl">

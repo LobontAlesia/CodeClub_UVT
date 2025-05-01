@@ -11,6 +11,7 @@ public class LearningCourse
     [StringLength(128)] public string BaseName { get; set; } = string.Empty;
     [StringLength(64)] public string Level { get; set; } = string.Empty;
     public int Duration { get; set; }
+    public int Index { get; set; }
     public bool IsPublished { get; set; }
 
     public Guid BadgeId { get; set; }

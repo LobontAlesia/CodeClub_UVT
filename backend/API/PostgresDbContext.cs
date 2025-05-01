@@ -104,6 +104,18 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
             .HasMany(q => q.Questions)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<QuizSubmission>()
+            .HasOne(qs => qs.User)
+            .WithMany()
+            .HasForeignKey(qs => qs.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<QuizSubmission>()
+            .HasOne(qs => qs.Quiz)
+            .WithMany()
+            .HasForeignKey(qs => qs.QuizId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public DbSet<User> Users { get; set; }
@@ -119,4 +131,5 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
     public DbSet<UserLearningCourse> UserLearningCourses { get; set; }
     public DbSet<QuizForm> QuizForms { get; set; }
     public DbSet<QuizQuestion> QuizQuestions { get; set; }
+    public DbSet<QuizSubmission> QuizSubmissions { get; set; } = null!;
 }

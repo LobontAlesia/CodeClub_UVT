@@ -18,16 +18,14 @@ import AddElementPage from "./pages/admin/AddElementPage";
 import EditElementPage from "./pages/admin/EditElementPage";
 import EditQuizPage from "./pages/admin/EditQuizPage";
 import AddQuizPage from "./pages/admin/AddQuizPage";
-import TakeQuizPage from "./pages/public/TakeQuizPage";
+import QuizPage from "./pages/public/QuizPage";
 import ChapterDetailsPage from "./pages/public/ChapterDetailsPage";
 import EditLessonPage from "./pages/admin/EditLessonPage";
 import ProtectedRoute from "./components/ProtectedRoute";
-
 import Navbar from "./components/Navbar";
 
 function App() {
 	const location = useLocation();
-
 	const hideNavbarOn = ["/login", "/register"];
 	const shouldHideNavbar = hideNavbarOn.includes(location.pathname);
 
@@ -115,7 +113,6 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-
 				<Route
 					path="/admin/edit-element/:elementId"
 					element={
@@ -124,7 +121,6 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-
 				<Route
 					path="/admin/edit-quiz/:formId"
 					element={
@@ -133,7 +129,6 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-
 				<Route
 					path="/admin/chapter/:chapterId/add-quiz"
 					element={
@@ -184,19 +179,11 @@ function App() {
 						</ProtectedRoute>
 					}
 				/>
-				{/* <Route
-					path="/quiz/:formId"
-					element={
-						<ProtectedRoute>
-							<QuizPage />
-						</ProtectedRoute>
-					}
-				/> */}
 				<Route
 					path="/quiz/:formId"
 					element={
 						<ProtectedRoute>
-							<TakeQuizPage />
+							<QuizPage />
 						</ProtectedRoute>
 					}
 				/>

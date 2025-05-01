@@ -17,9 +17,10 @@ public static class BadgeMapper
     public static BadgeModel MapBadgeEntityToBadgeModel(Badge badge) =>
         new BadgeModel()
         {
+            Id = badge.Id,
             Name = badge.Name,
             BaseName = badge.BaseName,
             Level = badge.Level,
-            Icon = badge.Icon // The icon is already in the correct format
+            Icon = badge.Icon
         };
 }
