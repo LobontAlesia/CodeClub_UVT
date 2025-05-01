@@ -1,0 +1,109 @@
+variables:
+    DOCKER_DRIVER: overlay2
+    REGISTRY: $CI_REGISTRY/code-club-uvt/frontend
+
+image:
+    name: docker:23.0.5
+
+services:
+    - docker:23.0.5-dind
+
+before_script:
+    - "command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )"
+
+    - eval $(ssh-agent -s)
+
+    - chmod 400 "$SSH_PRIVATE_KEY"
+    - ssh-add "$SSH_PRIVATE_KEY"
+
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+
+    - 'echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519'
+    - chmod 700 ~/.ssh/id_ed25519
+
+    - ssh-keyscan -H "$VM_HOST" >> ~/.ssh/known_hosts
+    - chmod 700 ~/.ssh/known_hosts
+    
+stages:
+    - cleanup
+    - build_and_push
+    - deploy
+
+# Main branch
+cleanup:
+    stage: cleanup
+    script:
+        - |
+            ssh -i ~/.ssh/id_ed25519 "$VM_USER"@"$VM_HOST" << 'EOF'
+                sudo su
+                cd code_club/main
+                docker compose -f docker-compose-frontend-main.yml down
+                docker system prune -a -f
+            EOF
+    only:
+        - main
+
+build_and_push:
+    stage: build_and_push
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+        - docker compose -f docker-compose.yml build
+        - docker tag frontend:latest "$REGISTRY/frontend-main:latest"
+
+        - docker push "$REGISTRY/frontend-main:latest"
+    only:
+        - main
+
+deploy:
+    stage: deploy
+    script:
+        - |
+            ssh -i ~/.ssh/id_ed25519 "$VM_USER"@"$VM_HOST" << 'EOF'
+                sudo su
+                cd code_club/main
+                docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+                docker compose -f docker-compose-frontend-main.yml up -d
+            EOF
+    only:
+        - main
+
+# Develop branch
+cleanup:
+    stage: cleanup
+    script:
+        - |
+            ssh -i ~/.ssh/id_ed25519 "$VM_USER"@"$VM_HOST" << 'EOF'
+                sudo su
+                cd code_club/develop
+                docker compose -f docker-compose-frontend-develop.yml down
+                docker system prune -a -f
+            EOF
+    only:
+        - develop
+
+build_and_push:
+    stage: build_and_push
+    script:
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+
+        - docker compose -f docker-compose.yml build
+        - docker tag frontend:latest "$REGISTRY/frontend-develop:latest"
+
+        - docker push "$REGISTRY/frontend-develop:latest"
+    only:
+        - develop
+
+deploy:
+    stage: deploy
+    script:
+        - |
+            ssh -i ~/.ssh/id_ed25519 "$VM_USER"@"$VM_HOST" << 'EOF'
+                sudo su
+                cd code_club/develop
+                docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+                docker compose -f docker-compose-frontend-develop.yml up -d
+            EOF
+    only:
+        - develop

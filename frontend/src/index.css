@@ -1,0 +1,87 @@
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--color-success: #4caf50; /* Verde Code Club */
+	--color-warning: #ff9800; /* Galben luminos */
+	--color-error: #f44336; /* Roșu */
+	--color-black: #000000;
+	--color-gray: #808080;
+	--color-light_gray: #bebebe;
+	--color-white: #ffffff;
+
+	--color-primary: #41b653; /* Verde */
+	--color-secondary: #da315f; /* Roz */
+	--color-accent: #46499e; /* Albastru */
+
+	/* Supporting colours */
+	--color-bright-orange: #f72a45;
+	--color-bright-yellow: #fefd00;
+	--color-bright-green: #4aba7a;
+	--color-bright-pink: #ef60a3;
+	--color-bright-blue: #31a9e0;
+
+	--color-dark-green: #37384d;
+	--color-dark-blue: #061719;
+	--color-dark-purple: #632341;
+
+	--color-background: #ffffff; /* Fundal deschis */
+	--color-text: #0f2108; /* Text întunecat */
+
+	transition-property: all;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 500ms;
+}
+
+body {
+	margin: 0;
+	padding-top: 64px; /* Height of the navbar */
+	font-family: "Lexend", sans-serif;
+	background-color: var(--color-background);
+	color: var(--color-text);
+}
+
+/* Light and Dark modes */
+.light {
+	--color-primary: #41b653;
+	--color-background: #ffffff;
+	--color-text: #0f2108;
+}
+
+.dark {
+	--color-primary: #41b653;
+	--color-background: #080c03;
+	--color-text: #e5f7de;
+}
+
+button {
+	background-color: var(--color-primary);
+	border-radius: 8px; /* Colțuri rotunjite pentru butoane */
+	padding: 10px 20px;
+}
+
+a {
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--color-secondary);
+}
+
+/* Breadcrumb hover styles */
+.hover\:text-white:hover {
+	color: white !important;
+	transition: color 0.2s ease;
+}
+
+::-webkit-scrollbar {
+	width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--color-gray);
+	border-radius: 5px;
+}
