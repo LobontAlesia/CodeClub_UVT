@@ -13,14 +13,19 @@ public class LearningCourseService(
 {
     public async Task<bool> CreateAsync(LearningCourseInputModel learningCourseInputModel)
     {
-        Badge? badge = await badgeRepository.GetByBaseNameAndLevelAsync(learningCourseInputModel.BaseName, learningCourseInputModel.Level);
+        // Găsim badge-ul după nume în loc de BaseName
+        var badges = await badgeRepository.GetAllAsync();
+        var badge = badges.FirstOrDefault(b => b.Name == learningCourseInputModel.BadgeName);
+        
         if (badge == null)
         {
             throw new ArgumentException("Badge not found");
         }
 
-        bool isUsed = await learningCourseRepository.ExistsWithBadgeAsync(badge.Id);
-        if (isUsed)
+        // Verificăm doar după ID, la fel ca în UpdateAsync
+        bool isUsedById = await learningCourseRepository.ExistsWithBadgeAsync(badge.Id);
+
+        if (isUsedById)
         {
             throw new InvalidOperationException("Badge is already used by another course");
         }
@@ -32,9 +37,7 @@ public class LearningCourseService(
             tags.Add(tag ?? new Tag { Name = tagName });
         }
 
-        LearningCourse learningCourse =
-            LearningCourseMapper.MapLearningCourseInputModelToLearningCourse(learningCourseInputModel);
-
+        LearningCourse learningCourse = LearningCourseMapper.MapLearningCourseInputModelToLearningCourse(learningCourseInputModel);
         learningCourse.Badge = badge;
         learningCourse.Tags = tags;
 
@@ -66,15 +69,16 @@ public class LearningCourseService(
         learningCourse.Duration = learningCoursePatchModel.Duration;
         learningCourse.BaseName = learningCoursePatchModel.BaseName;
 
-        Badge? badge = await badgeRepository.GetByBaseNameAndLevelAsync(
-            learningCoursePatchModel.BaseName,
-            learningCoursePatchModel.Level
-        );
+        // Folosim BadgeName în loc de BaseName și Level
+        var badges = await badgeRepository.GetAllAsync();
+        var badge = badges.FirstOrDefault(b => b.Name == learningCoursePatchModel.BadgeName);
 
         if (badge != null)
         {
-            bool isUsed = await learningCourseRepository.ExistsWithBadgeAsync(badge.Id, learningCourse.Id);
-            if (isUsed)
+            // Verificăm dacă badge-ul e deja folosit, dar excludem cursul curent
+            bool isUsedById = await learningCourseRepository.ExistsWithBadgeAsync(badge.Id, learningCourse.Id);
+
+            if (isUsedById)
             {
                 throw new InvalidOperationException("Badge is already used by another course");
             }

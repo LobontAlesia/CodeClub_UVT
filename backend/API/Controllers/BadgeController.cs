@@ -25,6 +25,23 @@ public class BadgeController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateBadge([FromBody] BadgeInputModel badgeInputModel)
     {
+        // Verifică dacă există deja un badge cu același icon
+        var existingBadge = await _context.Set<Badge>().FirstOrDefaultAsync(b => b.Icon == badgeInputModel.Icon);
+        if (existingBadge != null)
+        {
+            return BadRequest("A badge with this icon already exists.");
+        }
+
+        // Verifică dacă există deja un badge cu același BaseName și Level
+        var existingBadgeWithName = await _badgeRepository.GetByBaseNameAndLevelAsync(
+            badgeInputModel.BaseName.ToLower(),
+            badgeInputModel.Level
+        );
+        if (existingBadgeWithName != null)
+        {
+            return BadRequest("A badge with this base name and level already exists.");
+        }
+
         var result = await _badgeRepository.CreateAsync(
             BadgeMapper.MapBadgeInputModelToBadgeEntity(badgeInputModel)
         );
@@ -51,13 +68,8 @@ public class BadgeController : ControllerBase
 
         if (user == null) return NotFound();
 
-        var badges = (user.Badges ?? Enumerable.Empty<Badge>()).Select(b => new
-        {
-            name = b.Name,
-            baseName = b.BaseName,
-            level = b.Level,
-            icon = b.Icon
-        });
+        var badges = (user.Badges ?? Enumerable.Empty<Badge>())
+            .Select(BadgeMapper.MapBadgeEntityToBadgeModel);
 
         return Ok(badges);
     }

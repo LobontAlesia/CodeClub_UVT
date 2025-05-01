@@ -248,6 +248,57 @@ public class UserProgressController : ControllerBase
         }
     }
 
+    [HttpGet("lesson/{lessonId}")]
+    public async Task<ActionResult> GetLessonProgress([FromRoute] Guid lessonId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var userIdGuid = Guid.Parse(userId);
+
+            var chapters = await dbContext.Chapters
+                .Where(c => c.LessonId == lessonId)
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (chapters.Count == 0)
+            {
+                return Ok(new
+                {
+                    totalChapters = 0,
+                    completedChapters = 0,
+                    progressPercentage = 0
+                });
+            }
+
+            var completedChapters = await dbContext.UserChapters
+                .Where(uc => uc.UserId == userIdGuid && chapters.Contains(uc.ChapterId) && uc.Completed)
+                .Select(uc => uc.ChapterId)
+                .ToListAsync();
+
+            double progress = (double)completedChapters.Count / chapters.Count * 100;
+
+            return Ok(new
+            {
+                totalChapters = chapters.Count,
+                completedChapters = completedChapters.Count,
+                progressPercentage = Math.Round(progress, 2)
+            });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new
+            {
+                message = "Internal server error in GetLessonProgress",
+                error = ex.Message,
+                stackTrace = ex.StackTrace
+            });
+        }
+    }
+
     [HttpGet("last-activity")]
     public async Task<ActionResult> GetLastActivity()
     {
@@ -283,8 +334,10 @@ public class UserProgressController : ControllerBase
 
         var userIdGuid = Guid.Parse(userId);
 
+        // Get all published courses
         var courses = await dbContext.LearningCourses
             .Include(c => c.Badge)
+            .Include(c => c.Lessons)
             .Where(c => c.IsPublished)
             .Select(c => new
             {
@@ -293,6 +346,7 @@ public class UserProgressController : ControllerBase
                 description = c.Description,
                 level = c.Level,
                 duration = c.Duration,
+                isPublished = c.IsPublished,
                 badge = c.Badge != null ? new
                 {
                     name = c.Badge.Name,

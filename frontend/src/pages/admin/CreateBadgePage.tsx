@@ -10,6 +10,7 @@ const CreateBadgePage = () => {
 	const [baseName, setBaseName] = useState("");
 	const [level, setLevel] = useState("Beginner");
 	const [icon, setIcon] = useState<string | null>(null);
+	const [originalIcon, setOriginalIcon] = useState<string | null>(null);
 	const navigate = useNavigate();
 
 	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,7 +19,14 @@ const CreateBadgePage = () => {
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				const base64String = reader.result as string;
-				setIcon(base64String);
+				 // Salvăm imaginea originală pentru preview
+				setOriginalIcon(base64String);
+				
+				// Generăm identificatorul unic și salvăm imaginea modificată pentru trimitere
+				const timestamp = new Date().getTime();
+				const uniqueIdentifier = `${timestamp}-${Math.random().toString(36).substring(7)}`;
+				const uniqueBase64 = `${uniqueIdentifier}:${base64String}`;
+				setIcon(uniqueBase64);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -54,8 +62,8 @@ const CreateBadgePage = () => {
 			navigate("/dashboard");
 		} catch (error: any) {
 			console.error(error);
-			const message = error.response?.data?.includes("already exists")
-				? "A badge with this base name and level already exists."
+			const message = error.response?.data
+				? error.response.data
 				: "Failed to create badge.";
 			toast.error(message);
 		}
@@ -121,10 +129,10 @@ const CreateBadgePage = () => {
 					/>
 				</div>
 
-				{icon && (
+				 {originalIcon && (
 					<div className="mt-4 flex justify-center">
 						<img
-							src={icon}
+							src={originalIcon}
 							alt="Badge Preview"
 							className="h-24 w-24 rounded-full object-contain shadow-md"
 						/>

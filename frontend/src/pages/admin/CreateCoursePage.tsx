@@ -21,6 +21,9 @@ interface Course {
 	baseName: string;
 	isPublished: boolean;
 	tagNames: string[];
+	badge?: {
+		name: string;
+	};
 }
 
 const CreateCoursePage = () => {
@@ -70,16 +73,6 @@ const CreateCoursePage = () => {
 			const token = localStorage.getItem("token");
 			const headers = { Authorization: `Bearer ${token}` };
 
-			const badgeAlreadyUsed = courses.some(
-				(course) =>
-					course.baseName === baseName && course.level === level,
-			);
-
-			if (badgeAlreadyUsed) {
-				toast.error("This badge is already used by another course");
-				return;
-			}
-
 			await axios.post(
 				"http://localhost:5153/LearningCourse",
 				{
@@ -89,8 +82,7 @@ const CreateCoursePage = () => {
 					level,
 					duration,
 					tagNames: tags,
-					badgeName, // ✅ adăugat
-					lessonTitles: [], // poți popula ulterior
+					BadgeName: badgeName
 				},
 				{ headers },
 			);
@@ -100,7 +92,7 @@ const CreateCoursePage = () => {
 		} catch (error: any) {
 			console.error(error);
 			const msg = error.response?.data;
-			if (typeof msg === "string" && msg.includes("already used")) {
+			if (typeof msg === "string") {
 				toast.error(msg);
 			} else {
 				toast.error("Failed to create course");
@@ -225,7 +217,7 @@ const CreateCoursePage = () => {
 						type="submit"
 						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
 					>
-						➕ Create Course
+						 ➕ Create Course
 					</button>
 				</div>
 			</form>

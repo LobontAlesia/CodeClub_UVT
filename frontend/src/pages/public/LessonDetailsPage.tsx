@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
@@ -18,6 +18,12 @@ interface JwtPayload {
 	roles: string;
 }
 
+interface ChapterProgressResponse {
+	data: {
+		isCompleted: boolean;
+	};
+}
+
 export default function LessonDetailsPage() {
 	const { id: lessonId } = useParams<{ id: string }>();
 	const navigate = useNavigate();
@@ -34,14 +40,15 @@ export default function LessonDetailsPage() {
 		progressPercentage: 0,
 	});
 
-	const fetchLessonData = useCallback(async () => {
+	const fetchLessonData = async () => {
 		if (!lessonId) return;
 
 		try {
 			setLoading(true);
-			const [lessonResponse, chaptersResponse] = await Promise.all([
+			const [lessonResponse, chaptersResponse, progressResponse] = await Promise.all([
 				api.get(`/Lesson/${lessonId}`),
 				api.get(`/Chapter/lesson/${lessonId}`),
+				api.get(`/UserProgress/lesson/${lessonId}`)
 			]);
 
 			if (!lessonResponse?.data) {
@@ -54,21 +61,36 @@ export default function LessonDetailsPage() {
 			setCourseTitle(lessonResponse.data.courseTitle || "");
 
 			const chaptersData = chaptersResponse.data || [];
-			setChapters(chaptersData);
+			const chapterProgress = progressResponse.data || { completedChapters: 0, totalChapters: 0, progressPercentage: 0 };
+			
+			// Update chapters with completion status
+			const updatedChapters = chaptersData.map((chapter: Chapter) => ({
+				...chapter,
+				isCompleted: false // This will be set individually by checking each chapter
+			}));
+			setChapters(updatedChapters);
 
-			// Calculate progress based on completed chapters
+			// If not admin, fetch completion status for each chapter
 			if (!isAdmin) {
-				const totalChapters = chaptersData.length;
-				const completedChapters = chaptersData.filter(
-					(c: Chapter) => c.isCompleted,
-				).length;
+				const chapterProgressPromises = updatedChapters.map((chapter: Chapter) =>
+					api.get(`/UserProgress/chapter/${chapter.id}`)
+				);
+				const chapterProgressResults = await Promise.allSettled(chapterProgressPromises);
+				
+				const updatedChaptersWithProgress = updatedChapters.map((chapter: Chapter, index: number) => {
+					const progressResult = chapterProgressResults[index];
+					return {
+						...chapter,
+						isCompleted: progressResult.status === 'fulfilled' && (progressResult.value as ChapterProgressResponse)?.data?.isCompleted
+					};
+				});
+				setChapters(updatedChaptersWithProgress);
+
+				// Set overall lesson progress
 				setProgress({
-					completedChapters,
-					totalChapters,
-					progressPercentage:
-						totalChapters > 0
-							? (completedChapters / totalChapters) * 100
-							: 0,
+					completedChapters: chapterProgress.completedChapters,
+					totalChapters: chapterProgress.totalChapters,
+					progressPercentage: chapterProgress.progressPercentage
 				});
 			}
 		} catch (error: any) {
@@ -86,6 +108,10 @@ export default function LessonDetailsPage() {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	useEffect(() => {
+		fetchLessonData();
 	}, [lessonId, isAdmin, navigate]);
 
 	useEffect(() => {
@@ -103,10 +129,6 @@ export default function LessonDetailsPage() {
 			navigate("/login");
 		}
 	}, [navigate]);
-
-	useEffect(() => {
-		fetchLessonData();
-	}, [fetchLessonData]);
 
 	const handleDeleteChapter = async (chapterId: string) => {
 		if (!window.confirm("Are you sure you want to delete this chapter?"))
@@ -319,7 +341,7 @@ export default function LessonDetailsPage() {
 																		}}
 																		className="rounded bg-yellow-500 px-3 py-1 text-white hover:bg-yellow-600"
 																	>
-																		✏️ Edit
+																		 Edit
 																	</button>
 																	<button
 																		onClick={(
@@ -332,7 +354,7 @@ export default function LessonDetailsPage() {
 																		}}
 																		className="rounded bg-red-500 px-3 py-1 text-white hover:bg-red-600"
 																	>
-																		🗑️
+																		
 																		Delete
 																	</button>
 																</div>

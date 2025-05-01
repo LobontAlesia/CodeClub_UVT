@@ -27,14 +27,26 @@ public class LearningCourseRepository : BaseRepository<LearningCourse>, ILearnin
     public async Task<bool> ExistsWithBadgeAsync(Guid badgeId)
     {
         return await _context.LearningCourses
-            .Include(c => c.Badge)
-            .AnyAsync(c => c.Badge != null && c.Badge.Id == badgeId);
+            .AnyAsync(lc => lc.BadgeId == badgeId);
     }
 
     public async Task<bool> ExistsWithBadgeAsync(Guid badgeId, Guid excludeCourseId)
     {
         return await _context.LearningCourses
-            .Include(c => c.Badge)
-            .AnyAsync(c => c.Badge != null && c.Badge.Id == badgeId && c.Id != excludeCourseId);
+            .AnyAsync(lc => lc.BadgeId == badgeId && lc.Id != excludeCourseId);
+    }
+
+    public async Task<bool> ExistsWithBadgeIconAsync(string icon)
+    {
+        return await _context.LearningCourses
+            .Include(lc => lc.Badge)
+            .AnyAsync(lc => lc.Badge != null && lc.Badge.Icon == icon);
+    }
+
+    public async Task<bool> ExistsWithBadgeIconAsync(string icon, Guid excludeCourseId)
+    {
+        return await _context.LearningCourses
+            .Include(lc => lc.Badge)
+            .AnyAsync(lc => lc.Badge != null && lc.Badge.Icon == icon && lc.Id != excludeCourseId);
     }
 }

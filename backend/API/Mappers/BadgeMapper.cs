@@ -20,17 +20,6 @@ public static class BadgeMapper
             Name = badge.Name,
             BaseName = badge.BaseName,
             Level = badge.Level,
-            Icon = IsBase64String(badge.Icon)
-                ? System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(badge.Icon))
-                : badge.Icon
+            Icon = badge.Icon // The icon is already in the correct format
         };
-
-    private static bool IsBase64String(string? base64)
-    {
-        if (string.IsNullOrWhiteSpace(base64))
-            return false;
-
-        Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
-        return Convert.TryFromBase64String(base64, buffer, out _);
-    }
 }

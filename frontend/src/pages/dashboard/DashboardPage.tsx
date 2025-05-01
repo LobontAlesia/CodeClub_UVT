@@ -4,8 +4,8 @@ import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { motion } from "framer-motion";
-import { Sparkles, Medal, BookOpen, Wrench } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Sparkles, Medal, BookOpen, Wrench, X } from "lucide-react";
 
 interface JwtPayload {
 	roles: string;
@@ -38,6 +38,7 @@ const DashboardPage = () => {
 		lastActivityDate: undefined,
 		lastActivityName: undefined,
 	});
+	const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 
@@ -64,9 +65,9 @@ const DashboardPage = () => {
 			const token = localStorage.getItem("token");
 			const headers = { Authorization: `Bearer ${token}` };
 
-			const [coursesResponse, badgesResponse, lastActivityResponse] =
+			const [progressResponse, badgesResponse, lastActivityResponse] =
 				await Promise.all([
-					axios.get("http://localhost:5153/LearningCourse", {
+					axios.get("http://localhost:5153/UserProgress", {
 						headers,
 					}),
 					axios.get("http://localhost:5153/Badge/user", { headers }),
@@ -78,10 +79,10 @@ const DashboardPage = () => {
 					),
 				]);
 
-			const totalCourses = coursesResponse.data.length;
-			const completedCourses = coursesResponse.data.filter(
-				(course: any) => course.isCompleted,
-			).length;
+			// Filter only published courses and count them
+			const publishedCourses = progressResponse.data.filter((c: any) => c.isPublished);
+			const totalCourses = publishedCourses.length;
+			const completedCourses = publishedCourses.filter((c: any) => c.completed).length;
 
 			setProgress({
 				totalCourses,
@@ -95,6 +96,14 @@ const DashboardPage = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const openBadgeModal = (badge: Badge) => {
+		setSelectedBadge(badge);
+	};
+
+	const closeBadgeModal = () => {
+		setSelectedBadge(null);
 	};
 
 	const progressPercentage =
@@ -198,11 +207,14 @@ const DashboardPage = () => {
 								<div
 									key={index}
 									className="flex flex-col items-center"
+									onClick={() => openBadgeModal(badge)}
+									role="button"
+									tabIndex={0}
 								>
 									<img
 										src={badge.icon}
 										alt={badge.name}
-										className="h-16 w-16 rounded-full border shadow-sm"
+										className="h-16 w-16 rounded-full shadow-sm transition-transform hover:scale-110 cursor-pointer"
 									/>
 									<span className="mt-1 text-sm font-medium">
 										{badge.name}
@@ -252,17 +264,55 @@ const DashboardPage = () => {
 							onClick={() => navigate("/admin/create-course")}
 							className="rounded bg-green-500 px-4 py-2 font-bold text-white hover:bg-green-600"
 						>
-							➕ Create Course
+							 ➕ Create Course
 						</button>
 						<button
 							onClick={() => navigate("/admin/create-badge")}
 							className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-600"
 						>
-							🏅 Create Badge
+							 🏅 Create Badge
 						</button>
 					</div>
 				</motion.section>
 			)}
+
+			<AnimatePresence>
+				{selectedBadge && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						onClick={closeBadgeModal}
+						className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/30 p-4"
+					>
+						<motion.div
+							initial={{ scale: 0.5 }}
+							animate={{ scale: 1 }}
+							exit={{ scale: 0.5 }}
+							onClick={(e) => e.stopPropagation()}
+							className="relative rounded-2xl bg-white p-6 shadow-xl"
+						>
+							<button
+								onClick={closeBadgeModal}
+								className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+							>
+								<X size={24} />
+							</button>
+							<img
+								src={selectedBadge.icon}
+								alt={selectedBadge.name}
+								className="h-48 w-48 rounded-lg"
+							/>
+							<h3 className="mt-4 text-center text-xl font-bold">
+								{selectedBadge.name}
+							</h3>
+							<p className="text-center text-gray-600">
+								{selectedBadge.level}
+							</p>
+						</motion.div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };
