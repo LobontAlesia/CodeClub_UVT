@@ -57,7 +57,7 @@ export function LoginPage() {
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
+		<div className="login-page flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 			<img src={logo} alt="CodeClub Logo" className="mb-2 h-40" />
 
 			<div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-xl">
@@ -71,7 +71,7 @@ export function LoginPage() {
 						<div>
 							<label
 								htmlFor="username"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Username
 							</label>
@@ -83,7 +83,7 @@ export function LoginPage() {
 									{...register("username", {
 										required: true,
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 							</div>
 						</div>
@@ -92,7 +92,7 @@ export function LoginPage() {
 						<div>
 							<label
 								htmlFor="password"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Password
 							</label>
@@ -104,24 +104,24 @@ export function LoginPage() {
 									{...register("password", {
 										required: true,
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								<button
 									type="button"
 									onClick={() =>
 										setShowPassword(!showPassword)
 									}
-									className="text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 transform p-1 transition-all hover:text-green-600"
+									className="absolute right-3 top-1/2 -translate-y-1/2 transform p-1 text-gray-500 transition-all hover:text-green-600"
 								>
 									{showPassword ? (
 										<IconEyeOff
 											size={20}
-											className="text-white"
+											className="text-gray-500"
 										/>
 									) : (
 										<IconEye
 											size={20}
-											className="text-white"
+											className="text-gray-500"
 										/>
 									)}
 								</button>

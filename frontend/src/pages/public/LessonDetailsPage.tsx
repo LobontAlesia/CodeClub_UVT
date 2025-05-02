@@ -200,12 +200,12 @@ export default function LessonDetailsPage() {
 		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
 			<div className="mx-auto mb-4 max-w-4xl">
 				{/* Breadcrumb navigation */}
-				<div className="text-gray-600 flex items-center gap-2 text-sm">
+				<div className="flex items-center gap-2 text-sm text-gray-600">
 					{courseId && (
 						<>
 							<button
 								onClick={() => navigate(`/course/${courseId}`)}
-								className="transition-colors hover:text-white"
+								className="transition-colors hover:text-black"
 								type="button"
 							>
 								{courseTitle}
@@ -242,7 +242,7 @@ export default function LessonDetailsPage() {
 				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
 					{lessonTitle}
 				</h1>
-				<p className="text-gray-500 mt-2 flex items-center justify-center gap-2 text-lg">
+				<p className="mt-2 flex items-center justify-center gap-2 text-lg text-gray-500">
 					<span>⏱️ {lessonDuration} minutes</span>
 					<span>•</span>
 					<span>📚 {chapters.length} chapters</span>
@@ -283,7 +283,7 @@ export default function LessonDetailsPage() {
 							{progress.totalChapters} chapters
 						</span>
 					</div>
-					<div className="bg-gray-100 h-4 w-full overflow-hidden rounded-full">
+					<div className="h-4 w-full overflow-hidden rounded-full bg-gray-100">
 						<div
 							className="h-4 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
 							style={{ width: `${progress.progressPercentage}%` }}
@@ -308,7 +308,7 @@ export default function LessonDetailsPage() {
 								className="space-y-4"
 							>
 								{chapters.length === 0 ? (
-									<p className="text-gray-500 text-center">
+									<p className="text-center text-gray-500">
 										No chapters available yet.
 									</p>
 								) : (

@@ -73,4 +73,24 @@ public class BadgeController : ControllerBase
 
         return Ok(badges);
     }
+
+    [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteBadge([FromRoute] Guid id)
+    {
+        var badge = await _badgeRepository.GetByIdAsync(id);
+        if (badge == null)
+            return NotFound("Badge not found");
+
+        var course = await _context.LearningCourses
+            .FirstOrDefaultAsync(c => c.BadgeId == id);
+
+        if (course != null)
+        {
+            _context.LearningCourses.Remove(course);
+        }
+
+        await _badgeRepository.DeleteAsync(badge);
+        return Ok();
+    }
 }

@@ -125,7 +125,7 @@ export default function TakeQuizPage() {
 				<div className="flex items-center justify-between">
 					<button
 						onClick={() => navigate(-1)}
-						className="bg-gray-500 hover:bg-gray-600 flex items-center gap-2 rounded px-4 py-2 font-semibold text-white"
+						className="flex items-center gap-2 rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600"
 					>
 						← Back to Chapter
 					</button>
@@ -152,7 +152,7 @@ export default function TakeQuizPage() {
 							(answer, ansIdx) => (
 								<label
 									key={ansIdx}
-									className={`hover:bg-gray-50 mt-2 block cursor-pointer rounded-lg border p-3 ${
+									className={`mt-2 block cursor-pointer rounded-lg border p-3 hover:bg-gray-50 ${
 										submitted
 											? ansIdx === q.correctAnswerIndex
 												? "border-green-500 bg-green-100"
@@ -201,7 +201,7 @@ export default function TakeQuizPage() {
 						<button
 							onClick={handleSubmit}
 							disabled={loading || answers.some((a) => a === -1)}
-							className="disabled:bg-gray-400 rounded bg-green-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-green-700"
+							className="rounded bg-green-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-green-700 disabled:bg-gray-400"
 						>
 							{loading ? "Submitting..." : "Submit Answers"}
 						</button>
@@ -209,7 +209,7 @@ export default function TakeQuizPage() {
 						<>
 							<button
 								onClick={() => navigate(-1)}
-								className="bg-gray-500 hover:bg-gray-600 rounded px-6 py-2 font-semibold text-white"
+								className="rounded bg-gray-500 px-6 py-2 font-semibold text-white hover:bg-gray-600"
 							>
 								Back to Chapter
 							</button>
@@ -258,7 +258,7 @@ export default function TakeQuizPage() {
 							{result.message}
 						</p>
 						{result.passed && (
-							<p className="text-gray-600 mt-2 text-sm">
+							<p className="mt-2 text-sm text-gray-600">
 								Redirecting back to chapter...
 							</p>
 						)}

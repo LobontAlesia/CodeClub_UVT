@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
 
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegisterPage } from "./pages/auth/RegisterPage";
@@ -28,6 +29,24 @@ function App() {
 	const location = useLocation();
 	const hideNavbarOn = ["/login", "/register"];
 	const shouldHideNavbar = hideNavbarOn.includes(location.pathname);
+
+	useEffect(() => {
+		const isLoginPage = location.pathname === "/login";
+		const isRegisterPage = location.pathname === "/register";
+
+		if (isLoginPage) {
+			document.body.classList.add("login-page");
+		} else if (isRegisterPage) {
+			document.body.classList.add("register-page");
+		} else {
+			document.body.classList.remove("login-page", "register-page");
+		}
+
+		// Cleanup function to remove classes when component unmounts
+		return () => {
+			document.body.classList.remove("login-page", "register-page");
+		};
+	}, [location.pathname]);
 
 	return (
 		<>

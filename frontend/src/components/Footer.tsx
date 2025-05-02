@@ -5,7 +5,7 @@ const Footer = () => {
 	return (
 		<div
 			className={
-				"flex w-full flex-col items-center gap-10 bg-accent p-10"
+				"bg-accent flex w-full flex-col items-center gap-10 p-10"
 			}
 		>
 			<div className={"text-4xl font-bold"}>Code Club UVT</div>

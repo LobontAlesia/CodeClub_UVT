@@ -61,7 +61,7 @@ export function RegisterPage() {
 	};
 
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
+		<div className="register-page flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
 			<img src={logo} alt="CodeClub Logo" className="mb-8 h-40" />
 
 			<div className="w-full max-w-sm rounded-3xl bg-white p-8 shadow-xl">
@@ -75,7 +75,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="username"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Username
 							</label>
@@ -87,7 +87,7 @@ export function RegisterPage() {
 									{...register("username", {
 										required: "Username is required",
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.username && (
 									<p className="text-xs text-red-500">
@@ -101,7 +101,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="firstName"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								First Name
 							</label>
@@ -113,7 +113,7 @@ export function RegisterPage() {
 									{...register("firstName", {
 										required: "First name is required",
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.firstName && (
 									<p className="text-xs text-red-500">
@@ -127,7 +127,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="lastName"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Last Name
 							</label>
@@ -139,7 +139,7 @@ export function RegisterPage() {
 									{...register("lastName", {
 										required: "Last name is required",
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.lastName && (
 									<p className="text-xs text-red-500">
@@ -153,7 +153,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="email"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Email
 							</label>
@@ -165,7 +165,7 @@ export function RegisterPage() {
 									{...register("email", {
 										required: "Email is required",
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.email && (
 									<p className="text-xs text-red-500">
@@ -179,7 +179,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="password"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Password
 							</label>
@@ -196,7 +196,7 @@ export function RegisterPage() {
 												"Password must be at least 8 characters long, contain a number, an uppercase letter, and a special character",
 										},
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.password && (
 									<p className="text-xs text-red-500">
@@ -210,7 +210,7 @@ export function RegisterPage() {
 						<div>
 							<label
 								htmlFor="confirmPassword"
-								className="text-gray-700 block text-sm font-medium"
+								className="block text-sm font-medium text-gray-700"
 							>
 								Confirm Password
 							</label>
@@ -226,7 +226,7 @@ export function RegisterPage() {
 											value === watch("password") ||
 											"Passwords do not match",
 									})}
-									className="border-gray-300 w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+									className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 								/>
 								{errors.confirmPassword && (
 									<p className="text-xs text-red-500">

@@ -186,7 +186,7 @@ const CourseDetailsPage = () => {
 						<h3 className="text-lg font-semibold text-black group-hover:text-[var(--color-primary)]">
 							{lesson.title}
 						</h3>
-						<p className="text-gray-600 flex items-center gap-2 text-sm">
+						<p className="flex items-center gap-2 text-sm text-gray-600">
 							<span>⏱️ {lesson.duration} minutes</span>
 							<span>•</span>
 							<span>
@@ -241,10 +241,10 @@ const CourseDetailsPage = () => {
 		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
 			{/* Breadcrumb navigation */}
 			<div className="mx-auto mb-4 max-w-4xl">
-				<div className="text-gray-600 flex items-center gap-2 text-sm">
+				<div className="flex items-center gap-2 text-sm text-gray-600">
 					<button
 						onClick={() => navigate("/courses")}
-						className="transition-colors hover:text-white"
+						className="transition-colors hover:text-black"
 						type="button"
 					>
 						Courses
@@ -276,10 +276,10 @@ const CourseDetailsPage = () => {
 				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
 					{course.title}
 				</h1>
-				<p className="text-gray-700 mt-3 max-w-2xl text-lg">
+				<p className="mt-3 max-w-2xl text-lg text-gray-700">
 					{course.description}
 				</p>
-				<p className="text-gray-500 mt-2 flex items-center gap-2 text-sm">
+				<p className="mt-2 flex items-center gap-2 text-sm text-gray-500">
 					<span>⏱️ {course.duration}h</span>
 					<span>•</span>
 					<span>
@@ -302,7 +302,7 @@ const CourseDetailsPage = () => {
 								<p className="font-semibold">
 									{course.badge.name} Badge
 								</p>
-								<p className="text-gray-600 text-sm">
+								<p className="text-sm text-gray-600">
 									Complete the course to earn it! ✨
 								</p>
 							</div>
@@ -330,7 +330,7 @@ const CourseDetailsPage = () => {
 							{progress.totalLessons} lessons
 						</span>
 					</div>
-					<div className="bg-gray-100 h-4 w-full overflow-hidden rounded-full">
+					<div className="h-4 w-full overflow-hidden rounded-full bg-gray-100">
 						<div
 							className="h-4 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
 							style={{ width: `${progress.progressPercentage}%` }}
@@ -393,7 +393,7 @@ const CourseDetailsPage = () => {
 			</h2>
 
 			{lessons.length === 0 ? (
-				<p className="text-gray-500 text-center">
+				<p className="text-center text-gray-500">
 					No lessons available yet.
 				</p>
 			) : (

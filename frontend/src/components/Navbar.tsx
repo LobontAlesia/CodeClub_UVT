@@ -42,13 +42,13 @@ const Navbar = () => {
 				<div className="flex items-center gap-6">
 					<Link
 						to="/dashboard"
-						className="text-gray-700 font-semibold hover:text-green-600"
+						className="text-primary-color font-semibold hover:text-green-600"
 					>
 						Dashboard
 					</Link>
 
 					{/* 👑 opțional: afișăm rolul */}
-					<span className="text-gray-500 text-sm italic">
+					<span className="text-sm italic text-gray-500">
 						{role} {name ? `| ${name}` : ""}
 					</span>
 

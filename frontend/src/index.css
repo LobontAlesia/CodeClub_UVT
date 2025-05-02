@@ -43,6 +43,12 @@ body {
 	color: var(--color-text);
 }
 
+/* Remove padding for login and register pages */
+body.login-page,
+body.register-page {
+	padding-top: 0;
+}
+
 /* Light and Dark modes */
 .light {
 	--color-primary: #41b653;

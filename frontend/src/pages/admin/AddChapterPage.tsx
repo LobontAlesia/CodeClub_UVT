@@ -59,7 +59,7 @@ const AddChapterPage = () => {
 					<button
 						type="button"
 						onClick={() => navigate(`/lesson/${lessonId}`)}
-						className="bg-gray-500 hover:bg-gray-600 flex-1 rounded py-2 font-semibold text-white"
+						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
 					>
 						Cancel
 					</button>

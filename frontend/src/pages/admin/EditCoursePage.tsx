@@ -200,11 +200,15 @@ const EditCoursePage = () => {
 						{course.tagNames.map((tag, idx) => (
 							<span
 								key={idx}
-								className="bg-gray-200 flex items-center gap-2 rounded-full px-3 py-1 text-sm"
+								className="flex items-center gap-1.5 rounded-full bg-[#e8f5e9] px-3 py-1.5 text-sm font-medium text-[var(--color-primary)] transition-all hover:bg-[#d0ecd4]"
 							>
 								{tag}
-								<button onClick={() => handleRemoveTag(tag)}>
-									✖
+								<button
+									onClick={() => handleRemoveTag(tag)}
+									className="ml-1 flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-primary)] text-xs text-white opacity-80 transition-all hover:opacity-100"
+									title="Remove tag"
+								>
+									×
 								</button>
 							</span>
 						))}
@@ -214,7 +218,7 @@ const EditCoursePage = () => {
 				<div className="flex gap-4">
 					<button
 						onClick={() => navigate(-1)}
-						className="bg-gray-500 hover:bg-gray-600 flex-1 rounded py-2 font-semibold text-white"
+						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
 					>
 						Cancel
 					</button>

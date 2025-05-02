@@ -196,12 +196,12 @@ export default function ChapterDetailsPage() {
 		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
 			<div className="mx-auto max-w-4xl">
 				{/* Breadcrumb navigation */}
-				<div className="text-gray-600 mb-4 flex items-center gap-2 text-sm">
+				<div className="mb-4 flex items-center gap-2 text-sm text-gray-600">
 					{courseId && (
 						<>
 							<button
 								onClick={() => navigate(`/course/${courseId}`)}
-								className="transition-colors hover:text-white"
+								className="transition-colors hover:text-black"
 								type="button"
 							>
 								{courseTitle}
@@ -213,7 +213,7 @@ export default function ChapterDetailsPage() {
 						<>
 							<button
 								onClick={() => navigate(`/lesson/${lessonId}`)}
-								className="transition-colors hover:text-white"
+								className="transition-colors hover:text-black"
 								type="button"
 							>
 								{lessonTitle}
@@ -283,7 +283,7 @@ export default function ChapterDetailsPage() {
 								className="space-y-6"
 							>
 								{elements.length === 0 ? (
-									<p className="text-gray-500 text-center">
+									<p className="text-center text-gray-500">
 										No elements in this chapter yet.
 									</p>
 								) : (
@@ -320,7 +320,7 @@ export default function ChapterDetailsPage() {
 														}}
 													>
 														<div className="flex items-center gap-4">
-															{!isAdmin && (
+															{isAdmin && (
 																<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] text-lg font-bold text-white">
 																	{index + 1}
 																</div>
@@ -399,7 +399,7 @@ export default function ChapterDetailsPage() {
 														{element.type ===
 															"CodeFragment" &&
 															element.content && (
-																<pre className="bg-gray-900 relative overflow-x-auto rounded-lg p-4 font-mono text-sm shadow-lg">
+																<pre className="relative overflow-x-auto rounded-lg bg-white p-4 font-mono text-sm shadow-lg">
 																	<div className="mb-2 flex gap-2">
 																		<div className="h-3 w-3 rounded-full bg-red-500"></div>
 																		<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
@@ -468,7 +468,7 @@ export default function ChapterDetailsPage() {
 															element.type !==
 																"Form" &&
 															element.content && (
-																<div className="prose bg-gray-50 max-w-none rounded-lg p-6 leading-relaxed">
+																<div className="prose max-w-none rounded-lg bg-gray-50 p-6 leading-relaxed">
 																	<p className="text-lg">
 																		{
 																			element.content

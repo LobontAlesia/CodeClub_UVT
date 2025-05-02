@@ -189,7 +189,7 @@ export default function EditElementPage() {
 
 				{element.type === "Form" && (
 					<div>
-						<p className="text-gray-600 mb-2">
+						<p className="mb-2 text-gray-600">
 							{element.formId
 								? "This element has an associated quiz."
 								: "No quiz is currently linked to this element."}
@@ -228,7 +228,7 @@ export default function EditElementPage() {
 								<label className="mb-1 block font-semibold">
 									Preview:
 								</label>
-								<pre className="bg-gray-50 overflow-x-auto rounded-lg p-4">
+								<pre className="overflow-x-auto rounded-lg bg-gray-50 p-4">
 									<code className="font-mono text-sm">
 										{content}
 									</code>
@@ -267,7 +267,7 @@ export default function EditElementPage() {
 				<div className="flex gap-4">
 					<button
 						onClick={() => navigate(-1)}
-						className="bg-gray-500 hover:bg-gray-600 flex-1 rounded py-2 font-semibold text-white"
+						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
 					>
 						Cancel
 					</button>

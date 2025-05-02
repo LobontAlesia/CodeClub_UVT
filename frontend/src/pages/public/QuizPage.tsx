@@ -153,7 +153,7 @@ export default function TakeQuizPage() {
 					<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
 						{quiz.title}
 					</h1>
-					<p className="text-gray-600 mt-2 text-lg">
+					<p className="mt-2 text-lg text-gray-600">
 						Answer all questions to complete the quiz! 💪
 					</p>
 				</motion.div>
@@ -188,7 +188,7 @@ export default function TakeQuizPage() {
 								].map((answer, ansIdx) => (
 									<label
 										key={ansIdx}
-										className={`hover:bg-gray-50 block transform cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-1 ${
+										className={`block transform cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-1 hover:bg-gray-50 ${
 											submitted
 												? ansIdx ===
 													q.correctAnswerIndex
@@ -263,7 +263,7 @@ export default function TakeQuizPage() {
 						<button
 							onClick={handleSubmit}
 							disabled={loading || answers.some((a) => a === -1)}
-							className="disabled:bg-gray-400 transform rounded-xl bg-[var(--color-primary)] px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+							className="transform rounded-xl bg-[var(--color-primary)] px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl disabled:bg-gray-400"
 						>
 							{loading ? (
 								"Submitting..."

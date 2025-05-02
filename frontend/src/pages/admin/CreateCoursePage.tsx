@@ -218,7 +218,7 @@ const CreateCoursePage = () => {
 						{tags.map((tag, idx) => (
 							<span
 								key={idx}
-								className="bg-gray-200 rounded-full px-3 py-1 text-sm"
+								className="rounded-full bg-gray-200 px-3 py-1 text-sm"
 							>
 								{tag}
 							</span>
@@ -230,7 +230,7 @@ const CreateCoursePage = () => {
 					<button
 						type="button"
 						onClick={() => navigate("/dashboard")}
-						className="bg-gray-500 hover:bg-gray-600 flex-1 rounded py-2 font-semibold text-white"
+						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
 					>
 						Cancel
 					</button>
