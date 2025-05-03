@@ -218,7 +218,7 @@ const CreateCoursePage = () => {
 						{tags.map((tag, idx) => (
 							<span
 								key={idx}
-								className="rounded-full bg-gray-200 px-3 py-1 text-sm"
+								className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-600"
 							>
 								{tag}
 							</span>
@@ -229,8 +229,8 @@ const CreateCoursePage = () => {
 				<div className="flex gap-4">
 					<button
 						type="button"
-						onClick={() => navigate("/dashboard")}
-						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
+						onClick={() => navigate(-1)}
+						className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 					>
 						Cancel
 					</button>
@@ -238,7 +238,7 @@ const CreateCoursePage = () => {
 						type="submit"
 						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
 					>
-						➕ Create Course
+						Create Course
 					</button>
 				</div>
 			</form>

@@ -15,18 +15,14 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
         modelBuilder.Entity<UserChapter>(entity =>
         {
             entity.ToTable("UserChapters");
-            
-            // Primary key
+
             entity.HasKey(uc => uc.Id);
-            
-            // Properties
             entity.Property(uc => uc.UserId).IsRequired();
             entity.Property(uc => uc.ChapterId).IsRequired();
             entity.Property(uc => uc.Completed).IsRequired();
             entity.Property(uc => uc.CreatedAt).IsRequired();
             entity.Property(uc => uc.CompletedAt).IsRequired(false);
 
-            // Relationships
             entity.HasOne(uc => uc.User)
                 .WithMany()
                 .HasForeignKey(uc => uc.UserId)
@@ -99,7 +95,7 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
             .HasOne<LearningCourse>(ulc => ulc.LearningCourse)
             .WithMany()
             .HasForeignKey(ulc => ulc.CourseId);
-        
+
         modelBuilder.Entity<QuizForm>()
             .HasMany(q => q.Questions)
             .WithOne()
@@ -116,7 +112,39 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
             .WithMany()
             .HasForeignKey(qs => qs.QuizId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // 👇👇👇 NOILE RELAȚII pentru Portfolio și External Badges 👇👇👇
+
+        // User -> Portfolios
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Portfolios)
+            .WithOne(p => p.User)
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Portfolio -> ExternalBadge
+        modelBuilder.Entity<Portfolio>()
+            .HasOne(p => p.ExternalBadge)
+            .WithMany()
+            .HasForeignKey(p => p.ExternalBadgeId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // User -> UserExternalBadges (many-to-many cu entitate intermediară)
+        modelBuilder.Entity<UserExternalBadge>()
+            .HasKey(ueb => ueb.Id);
+
+        modelBuilder.Entity<UserExternalBadge>()
+            .HasOne(ueb => ueb.User)
+            .WithMany(u => u.ExternalBadges)
+            .HasForeignKey(ueb => ueb.UserId);
+
+        modelBuilder.Entity<UserExternalBadge>()
+            .HasOne(ueb => ueb.ExternalBadge)
+            .WithMany(b => b.Users)
+            .HasForeignKey(ueb => ueb.ExternalBadgeId);
     }
+
+    // 👇 DbSet-urile existente
 
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
@@ -132,4 +160,10 @@ public class PostgresDbContext(DbContextOptions<PostgresDbContext> options) : Db
     public DbSet<QuizForm> QuizForms { get; set; }
     public DbSet<QuizQuestion> QuizQuestions { get; set; }
     public DbSet<QuizSubmission> QuizSubmissions { get; set; } = null!;
+
+    // 👇 NOILE DbSet-uri
+
+    public DbSet<Portfolio> Portfolios { get; set; } = null!;
+    public DbSet<ExternalBadge> ExternalBadges { get; set; } = null!;
+    public DbSet<UserExternalBadge> UserExternalBadges { get; set; } = null!;
 }

@@ -9,5 +9,7 @@ public static class AddServiceExtensions
         services
             .AddTransient<IAuthService, AuthService>()
             .AddTransient<IUserService, UserService>()
-            .AddTransient<ILearningCourseService, LearningCourseService>();
+            .AddTransient<ILearningCourseService, LearningCourseService>()
+            .AddTransient<IExternalBadgeService, ExternalBadgeService>()
+            .AddTransient<IPortfolioService, PortfolioService>();
 }

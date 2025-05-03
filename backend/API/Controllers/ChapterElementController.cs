@@ -67,6 +67,9 @@ namespace API.Controllers
                 if (!model.IsChunk || model.ChunkIndex >= model.TotalChunks)
                     return BadRequest("Invalid chunk data");
 
+                if (string.IsNullOrEmpty(model.Image))
+                    return BadRequest("Image chunk cannot be null or empty");
+
                 var chunkKey = $"{chapterId}_{model.Title}_{DateTime.UtcNow:yyyyMMdd}";
                 var chunks = _imageChunks.GetOrAdd(chunkKey, _ => new List<string>());
 
@@ -143,6 +146,9 @@ namespace API.Controllers
             {
                 if (!model.IsChunk || model.ChunkIndex >= model.TotalChunks)
                     return BadRequest("Invalid chunk data");
+
+                if (string.IsNullOrEmpty(model.Image))
+                    return BadRequest("Image chunk cannot be null or empty");
 
                 var chunkKey = $"{elementId}_{model.Title}_{DateTime.UtcNow:yyyyMMdd}";
                 var chunks = _imageChunks.GetOrAdd(chunkKey, _ => new List<string>());

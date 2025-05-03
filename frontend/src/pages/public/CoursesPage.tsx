@@ -217,7 +217,7 @@ const CoursesPage = () => {
 								className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
 									selectedTags.includes(tag)
 										? "bg-[var(--color-secondary)] text-white"
-										: "bg-color-primary text-white"
+										: "bg-orange-500 text-white"
 								}`}
 							>
 								{tag}

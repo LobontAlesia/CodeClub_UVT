@@ -8,6 +8,7 @@ import { RegisterPage } from "./pages/auth/RegisterPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 import CreateCoursePage from "./pages/admin/CreateCoursePage";
 import CreateBadgePage from "./pages/admin/CreateBadgePage";
+import CreateExternalBadgePage from "./pages/admin/CreateExternalBadgePage";
 import CoursesPage from "./pages/public/CoursesPage";
 import CourseDetailsPage from "./pages/public/CourseDetailsPage";
 import EditCoursePage from "./pages/admin/EditCoursePage";
@@ -22,8 +23,13 @@ import AddQuizPage from "./pages/admin/AddQuizPage";
 import QuizPage from "./pages/public/QuizPage";
 import ChapterDetailsPage from "./pages/public/ChapterDetailsPage";
 import EditLessonPage from "./pages/admin/EditLessonPage";
+import ProjectReviewsPage from "./pages/admin/ProjectReviewsPage";
+import MyProjectsPage from "./pages/public/MyProjectsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import AddProjectPage from "./pages/public/AddProjectPage";
+import ProjectDetailsPage from "./pages/public/ProjectDetailsPage";
+import EditProjectPage from "./pages/public/EditProjectPage";
 
 function App() {
 	const location = useLocation();
@@ -69,6 +75,14 @@ function App() {
 
 				{/* Admin routes */}
 				<Route
+					path="/admin/project-reviews"
+					element={
+						<ProtectedRoute requireAdmin>
+							<ProjectReviewsPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
 					path="/admin/create-course"
 					element={
 						<ProtectedRoute requireAdmin>
@@ -81,6 +95,14 @@ function App() {
 					element={
 						<ProtectedRoute requireAdmin>
 							<CreateBadgePage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/admin/create-external-badge"
+					element={
+						<ProtectedRoute requireAdmin>
+							<CreateExternalBadgePage />
 						</ProtectedRoute>
 					}
 				/>
@@ -167,6 +189,30 @@ function App() {
 
 				{/* Public routes */}
 				<Route
+					path="/my-projects"
+					element={
+						<ProtectedRoute>
+							<MyProjectsPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/project/:id"
+					element={
+						<ProtectedRoute>
+							<ProjectDetailsPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/edit-project/:id"
+					element={
+						<ProtectedRoute>
+							<EditProjectPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
 					path="/courses"
 					element={
 						<ProtectedRoute>
@@ -203,6 +249,15 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<QuizPage />
+						</ProtectedRoute>
+					}
+				/>
+
+				<Route
+					path="/admin/add-project"
+					element={
+						<ProtectedRoute>
+							<AddProjectPage />
 						</ProtectedRoute>
 					}
 				/>

@@ -171,19 +171,19 @@ const AddQuizPage = () => {
 					</ul>
 				</div>
 
-				<div className="mt-6 flex gap-4">
+				<div className="mt-8 flex gap-4">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
-						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
+						className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
+						className="flex-1 rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
 					>
-						➕ Save Quiz
+						Create Quiz
 					</button>
 				</div>
 			</form>

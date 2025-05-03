@@ -23,4 +23,8 @@ public class User
 
     public List<Role> Roles { get; set; } = new();
     public List<Badge> Badges { get; set; } = new();
+    public List<Portfolio> Portfolios { get; set; } = new();
+    public List<UserExternalBadge> ExternalBadges { get; set; } = new();
+
+
 }

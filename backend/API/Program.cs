@@ -16,14 +16,14 @@ EnvironmentVariables.SetEnvironmentVariables(builder.Configuration);
 // Configure Kestrel
 builder.WebHost.ConfigureKestrel(options => {
     options.Limits.MaxRequestBodySize = 52428800; // 50MB
-    options.Limits.MaxRequestHeadersTotalSize = 32768; // 32KB
+    options.Limits.MaxRequestHeadersTotalSize = 65536; // 64KB
     options.Limits.RequestHeadersTimeout = TimeSpan.FromSeconds(60);
 });
 
 builder.Services.Configure<KestrelServerOptions>(options =>
 {
     options.Limits.MaxRequestBodySize = 52428800; // 50MB
-    options.Limits.MaxRequestHeadersTotalSize = 32768; // 32KB
+    options.Limits.MaxRequestHeadersTotalSize = 65536; // 64KB
 });
 
 builder.Services.Configure<IISServerOptions>(options =>

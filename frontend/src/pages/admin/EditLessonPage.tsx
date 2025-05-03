@@ -107,8 +107,8 @@ const EditLessonPage = () => {
 				<div className="flex gap-4">
 					<button
 						type="button"
-						onClick={() => navigate(-1)}
-						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
+						onClick={() => navigate(`/course/${learningCourseId}`)}
+						className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
 					>
 						Cancel
 					</button>
@@ -116,14 +116,14 @@ const EditLessonPage = () => {
 						type="submit"
 						className="flex-1 rounded bg-yellow-500 py-2 font-semibold text-white hover:bg-yellow-600"
 					>
-						✏️ Save Changes
+						Save Changes
 					</button>
 					<button
 						type="button"
 						onClick={handleDelete}
 						className="flex-1 rounded bg-red-500 py-2 font-semibold text-white hover:bg-red-600"
 					>
-						🗑️ Delete
+						Delete
 					</button>
 				</div>
 			</form>

@@ -15,5 +15,7 @@ public static class AddRepositoryExtensions
             .AddTransient<IBadgeRepository, BadgeRepository>()
             .AddTransient<IChapterRepository, ChapterRepository>()
             .AddTransient<IChapterElementRepository, ChapterElementRepository>()
-            .AddTransient<IQuizFormRepository, QuizFormRepository>(); 
+            .AddTransient<IQuizFormRepository, QuizFormRepository>()
+            .AddTransient<IExternalBadgeRepository, ExternalBadgeRepository>()
+            .AddTransient<IPortfolioRepository, PortfolioRepository>(); 
 }

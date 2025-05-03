@@ -115,6 +115,31 @@ namespace API.Migrations
                     b.ToTable("ChapterElements");
                 });
 
+            modelBuilder.Entity("API.Entities.ExternalBadge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExternalBadges");
+                });
+
             modelBuilder.Entity("API.Entities.LearningCourse", b =>
                 {
                     b.Property<Guid>("Id")
@@ -190,6 +215,58 @@ namespace API.Migrations
                     b.HasIndex("LearningCourseId");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("API.Entities.Portfolio", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<Guid?>("ExternalBadgeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ExternalLink")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Feedback")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ScreenshotUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalBadgeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Portfolios");
                 });
 
             modelBuilder.Entity("API.Entities.QuizForm", b =>
@@ -478,6 +555,27 @@ namespace API.Migrations
                     b.ToTable("RoleUser", (string)null);
                 });
 
+            modelBuilder.Entity("UserExternalBadge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ExternalBadgeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExternalBadgeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserExternalBadges");
+                });
+
             modelBuilder.Entity("API.Entities.Chapter", b =>
                 {
                     b.HasOne("API.Entities.Lesson", "Lesson")
@@ -526,6 +624,24 @@ namespace API.Migrations
                         .IsRequired();
 
                     b.Navigation("LearningCourse");
+                });
+
+            modelBuilder.Entity("API.Entities.Portfolio", b =>
+                {
+                    b.HasOne("API.Entities.ExternalBadge", "ExternalBadge")
+                        .WithMany()
+                        .HasForeignKey("ExternalBadgeId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("API.Entities.User", "User")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExternalBadge");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("API.Entities.QuizQuestion", b =>
@@ -657,11 +773,35 @@ namespace API.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("UserExternalBadge", b =>
+                {
+                    b.HasOne("API.Entities.ExternalBadge", "ExternalBadge")
+                        .WithMany("Users")
+                        .HasForeignKey("ExternalBadgeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Entities.User", "User")
+                        .WithMany("ExternalBadges")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExternalBadge");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("API.Entities.Chapter", b =>
                 {
                     b.Navigation("Elements");
 
                     b.Navigation("UserChapters");
+                });
+
+            modelBuilder.Entity("API.Entities.ExternalBadge", b =>
+                {
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("API.Entities.LearningCourse", b =>
@@ -677,6 +817,13 @@ namespace API.Migrations
             modelBuilder.Entity("API.Entities.QuizForm", b =>
                 {
                     b.Navigation("Questions");
+                });
+
+            modelBuilder.Entity("API.Entities.User", b =>
+                {
+                    b.Navigation("ExternalBadges");
+
+                    b.Navigation("Portfolios");
                 });
 #pragma warning restore 612, 618
         }

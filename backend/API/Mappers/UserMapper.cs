@@ -11,6 +11,7 @@ public static class UserMapper
     public static UserModel MapUserEntityToUserModel(User user) =>
         new UserModel()
         {
+            Id = user.Id,
             Username = user.Username,
             FirstName = user.FirstName,
             LastName = user.LastName,
