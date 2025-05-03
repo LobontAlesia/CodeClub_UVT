@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Wrench } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FiBook, FiAward, FiStar, FiClipboard } from "react-icons/fi";
 
 const AdminToolsSection = () => {
 	const navigate = useNavigate();
@@ -31,25 +32,25 @@ const AdminToolsSection = () => {
 						onClick={() => navigate("/admin/create-course")}
 						className="bg-500 group flex transform items-center gap-2 rounded-xl px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
 					>
-						<span className="text-lg">📚</span> Create Course
+						<FiBook className="text-lg" /> Create Course
 					</button>
 					<button
 						onClick={() => navigate("/admin/create-badge")}
 						className="group flex transform items-center gap-2 rounded-xl bg-blue-500 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
 					>
-						<span className="text-lg">🏅</span> Course Badge
+						<FiAward className="text-lg" /> Course Badge
 					</button>
 					<button
 						onClick={() => navigate("/admin/create-external-badge")}
 						className="group flex transform items-center gap-2 rounded-xl bg-purple-500 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
 					>
-						<span className="text-lg">🎖️</span> External Badge
+						<FiStar className="text-lg" /> External Badge
 					</button>
 					<button
 						onClick={() => navigate("/admin/project-reviews")}
 						className="group flex transform items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
 					>
-						<span className="text-lg">📝</span> Review Projects
+						<FiClipboard className="text-lg" /> Review Projects
 					</button>
 				</div>
 			</div>

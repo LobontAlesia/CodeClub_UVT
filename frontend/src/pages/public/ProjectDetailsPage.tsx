@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/api";
 
 interface Portfolio {
@@ -156,13 +157,15 @@ export default function ProjectDetailsPage() {
 									onClick={handleEdit}
 									className="transform rounded-lg bg-yellow-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-yellow-600 hover:shadow-lg"
 								>
-									✏️ Edit
+									<FiEdit className="mr-2 inline-block" />
+									Edit
 								</button>
 								<button
 									onClick={handleDelete}
 									className="transform rounded-lg bg-red-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-red-600 hover:shadow-lg"
 								>
-									🗑️ Delete
+									<FiTrash2 className="mr-2 inline-block" />
+									Delete
 								</button>
 							</div>
 						</div>

@@ -111,7 +111,7 @@ export function LoginPage() {
 									onClick={() =>
 										setShowPassword(!showPassword)
 									}
-									className="absolute right-3 top-1/2 -translate-y-1/2 transform p-1 text-gray-500 transition-all hover:text-green-600"
+									className="absolute right-3 top-1/2 -translate-y-1/2 transform p-1 text-gray-500 transition-all hover:text-green-600 "
 								>
 									{showPassword ? (
 										<IconEyeOff

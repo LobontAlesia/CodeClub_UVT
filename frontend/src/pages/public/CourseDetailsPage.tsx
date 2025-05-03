@@ -5,6 +5,19 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import {
+	FiClock,
+	FiFileText,
+	FiEdit,
+	FiTrash2,
+	FiSend,
+	FiPlus,
+	FiBook,
+	FiAward,
+	FiCheckCircle,
+	FiX,
+} from "react-icons/fi";
+import { BsRocketTakeoff, BsStar, BsTrophy, BsTree } from "react-icons/bs";
 
 interface Lesson {
 	id: string;
@@ -176,28 +189,32 @@ const CourseDetailsPage = () => {
 			<Link
 				key={lesson.id}
 				to={`/lesson/${lesson.id}`}
-				className="group relative block transform overflow-hidden rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+				className="group relative block transform overflow-hidden rounded-xl bg-white p-5 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
 			>
-				<div className="flex items-center gap-4">
-					<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-lg font-bold text-white">
+				<div className="flex items-center gap-5">
+					<div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-xl font-bold text-white">
 						{lesson.index}
 					</div>
 					<div>
-						<h3 className="text-lg font-semibold text-black group-hover:text-[var(--color-primary)]">
+						<h3 className="text-xl font-semibold text-black group-hover:text-[var(--color-primary)]">
 							{lesson.title}
 						</h3>
-						<p className="flex items-center gap-2 text-sm text-gray-600">
-							<span>⏱️ {lesson.duration} minutes</span>
+						<p className="mt-1 flex items-center gap-2 text-sm text-gray-600">
+							<span className="flex items-center">
+								<FiClock className="mr-1" /> {lesson.duration}{" "}
+								minutes
+							</span>
 							<span>•</span>
-							<span>
-								📝 {lesson.chapterTitles.length} chapters
+							<span className="flex items-center">
+								<FiFileText className="mr-1" />{" "}
+								{lesson.chapterTitles.length} chapters
 							</span>
 						</p>
 					</div>
 				</div>
 				{isAdmin && (
 					<div
-						className="absolute right-4 top-1/2 hidden -translate-y-1/2 transform gap-2 group-hover:flex"
+						className="absolute right-5 top-1/2 hidden -translate-y-1/2 transform gap-2 group-hover:flex"
 						onClick={(e) => e.preventDefault()}
 					>
 						<button
@@ -206,7 +223,7 @@ const CourseDetailsPage = () => {
 							}
 							className="rounded-lg bg-yellow-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-yellow-600"
 						>
-							✏️ Edit
+							<FiEdit className="mr-1 inline" /> Edit
 						</button>
 					</div>
 				)}
@@ -249,7 +266,7 @@ const CourseDetailsPage = () => {
 					>
 						Courses
 					</button>
-					<span>🚀</span>
+					<BsRocketTakeoff className="text-[var(--color-primary)]" />
 					<span className="text-[var(--color-primary)]">
 						{course.title}
 					</span>
@@ -267,27 +284,37 @@ const CourseDetailsPage = () => {
 						alt="Code icon"
 						className="mb-4 h-16 w-16"
 					/>
-					<div className="absolute -right-2 -top-2 animate-bounce">
-						{course.level === "Beginner" && "🌱"}
-						{course.level === "Intermediate" && "⭐"}
-						{course.level === "Advanced" && "🏆"}
-					</div>
 				</div>
-				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
+				<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
 					{course.title}
 				</h1>
-				<p className="mt-3 max-w-2xl text-lg text-gray-700">
+				<p className="mt-3 max-w-4xl text-lg text-gray-700">
 					{course.description}
 				</p>
 				<p className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-					<span>⏱️ {course.duration}h</span>
+					<span className="flex items-center">
+						<FiClock className="mr-1" /> {course.duration}h
+					</span>
 					<span>•</span>
-					<span>
-						{course.level === "Beginner" &&
-							"🌱 Perfect for beginners"}
-						{course.level === "Intermediate" &&
-							"⭐ Intermediate level"}
-						{course.level === "Advanced" && "🏆 For experts"}
+					<span className="flex items-center">
+						{course.level === "Beginner" && (
+							<>
+								<BsTree className="mr-1 text-green-500" />{" "}
+								Perfect for beginners
+							</>
+						)}
+						{course.level === "Intermediate" && (
+							<>
+								<BsStar className="mr-1 text-yellow-500" />{" "}
+								Intermediate level
+							</>
+						)}
+						{course.level === "Advanced" && (
+							<>
+								<BsTrophy className="mr-1 text-amber-500" /> For
+								experts
+							</>
+						)}
 					</span>
 				</p>
 				{course.badge && (
@@ -303,7 +330,8 @@ const CourseDetailsPage = () => {
 									{course.badge.name} Badge
 								</p>
 								<p className="text-sm text-gray-600">
-									Complete the course to earn it! ✨
+									Complete the course to earn it!{" "}
+									<FiAward className="ml-1 inline text-amber-500" />
 								</p>
 							</div>
 						</div>
@@ -338,7 +366,7 @@ const CourseDetailsPage = () => {
 					</div>
 					{progress.isCompleted && course.badge && (
 						<div className="mt-4 animate-bounce text-center">
-							<span className="text-lg">🎉</span>
+							<FiCheckCircle className="inline text-lg text-[var(--color-primary)]" />
 							<span className="ml-2 text-sm font-medium text-[var(--color-primary)]">
 								Congratulations! You've earned the{" "}
 								{course.badge.name} badge!
@@ -357,21 +385,29 @@ const CourseDetailsPage = () => {
 						className="transform rounded-lg bg-yellow-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-yellow-600 hover:shadow-lg"
 						type="button"
 					>
-						✏️ Edit Course
+						<FiEdit className="mr-1 inline" /> Edit Course
 					</button>
 					<button
 						onClick={handleDelete}
 						className="transform rounded-lg bg-red-500 px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-red-600 hover:shadow-lg"
 						type="button"
 					>
-						🗑️ Delete
+						<FiTrash2 className="mr-1 inline" /> Delete
 					</button>
 					<button
 						onClick={() => handlePublishToggle(!course.isPublished)}
 						className={`transform rounded-lg ${publishButtonClassName} shadow transition-all hover:-translate-y-1 hover:shadow-lg`}
 						type="button"
 					>
-						{course.isPublished ? "🚫 Unpublish" : "📢 Publish"}
+						{course.isPublished ? (
+							<>
+								<FiX className="mr-1 inline" /> Unpublish
+							</>
+						) : (
+							<>
+								<FiSend className="mr-1 inline" /> Publish
+							</>
+						)}
 					</button>
 					<button
 						onClick={() =>
@@ -382,13 +418,13 @@ const CourseDetailsPage = () => {
 						className="transform rounded-lg bg-[var(--color-accent)] px-4 py-2 font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-[#5658ac] hover:shadow-lg"
 						type="button"
 					>
-						➕ Add Lesson
+						<FiPlus className="mr-1 inline" /> Add Lesson
 					</button>
 				</div>
 			)}
 
 			<h2 className="mb-6 text-center text-2xl font-semibold">
-				<span className="mr-2">📚</span>
+				<FiBook className="mr-2 inline text-[var(--color-primary)]" />
 				Lessons in this Course
 			</h2>
 
@@ -397,7 +433,7 @@ const CourseDetailsPage = () => {
 					No lessons available yet.
 				</p>
 			) : (
-				<div className="mx-auto max-w-2xl">
+				<div className="mx-auto max-w-4xl">
 					<DragDropContext onDragEnd={handleDragEnd}>
 						<Droppable droppableId="lessons">
 							{(provided) => (

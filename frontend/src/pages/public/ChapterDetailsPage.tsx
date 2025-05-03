@@ -4,7 +4,9 @@ import { toast } from "react-toastify";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import api from "../../utils/api";
 import { motion } from "framer-motion";
-import { Plus, ArrowLeft, CheckCircle } from "lucide-react";
+import { Plus, ArrowLeft, CheckCircle, Wand2 } from "lucide-react";
+import { FiTarget } from "react-icons/fi";
+import { BsRocketTakeoff, BsBook } from "react-icons/bs";
 
 interface ChapterElement {
 	id: string;
@@ -16,6 +18,13 @@ interface ChapterElement {
 	formId?: string;
 }
 
+interface GeneratedQuizQuestion {
+	question: string;
+	options: string[];
+	correctAnswerIndex: number;
+	explanation: string;
+}
+
 export default function ChapterDetailsPage() {
 	const { chapterId } = useParams<{ chapterId: string }>();
 	const navigate = useNavigate();
@@ -23,6 +32,7 @@ export default function ChapterDetailsPage() {
 	const [elements, setElements] = useState<ChapterElement[]>([]);
 	const [chapterTitle, setChapterTitle] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+	const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
 	const [chapterProgress, setChapterProgress] = useState({
 		isCompleted: false,
 	});
@@ -30,6 +40,10 @@ export default function ChapterDetailsPage() {
 	const [lessonTitle, setLessonTitle] = useState("");
 	const [courseId, setCourseId] = useState<string | null>(null);
 	const [courseTitle, setCourseTitle] = useState("");
+	const [generatedQuestions, setGeneratedQuestions] = useState<
+		GeneratedQuizQuestion[]
+	>([]);
+	const [showQuizPreview, setShowQuizPreview] = useState(false);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -184,6 +198,81 @@ export default function ChapterDetailsPage() {
 		}
 	};
 
+	const handleGenerateQuiz = async () => {
+		setIsGeneratingQuiz(true);
+		try {
+			const response = await api.post<GeneratedQuizQuestion[]>(
+				`/Chapter/${chapterId}/generate-quiz`,
+			);
+			setGeneratedQuestions(response.data);
+			setShowQuizPreview(true);
+			toast.success("Quiz generated successfully! 🎯");
+		} catch (error) {
+			console.error("Error generating quiz:", error);
+			toast.error("Failed to generate quiz");
+		} finally {
+			setIsGeneratingQuiz(false);
+		}
+	};
+
+	const handleSaveQuiz = async () => {
+		try {
+			// Pentru debugging, să vedem cum arată datele
+			console.log("Generated questions to save:", generatedQuestions);
+
+			// Mapăm datele în formatul așteptat de backend
+			const formattedQuestions = generatedQuestions.map((q) => {
+				const options = Array.isArray(q.options) ? q.options : [];
+
+				// Asigură-te că avem 4 opțiuni
+				while (options.length < 4) {
+					options.push("No answer");
+				}
+
+				return {
+					questionText: q.question || "",
+					answer1: options[0] || "",
+					answer2: options[1] || "",
+					answer3: options[2] || "",
+					answer4: options[3] || "",
+					correctAnswerIndex:
+						typeof q.correctAnswerIndex !== "undefined"
+							? q.correctAnswerIndex
+							: 0,
+				};
+			});
+
+			console.log("Formatted questions for backend:", formattedQuestions);
+
+			// Create new quiz form - folosim formatul corect și includem ChapterId
+			const quizResponse = await api.post("/QuizForm", {
+				title: `${chapterTitle} - Quiz`,
+				questions: formattedQuestions,
+				chapterId: chapterId, // Adăugăm chapterId care este necesar
+			});
+
+			console.log("Quiz form created:", quizResponse.data);
+
+			toast.success("Quiz saved successfully! 🎉");
+			setShowQuizPreview(false);
+			fetchElements();
+		} catch (error: any) {
+			console.error("Error saving quiz:", error);
+
+			// Afișăm mai multe detalii despre eroare pentru debugging
+			if (error.response) {
+				console.error("Response error data:", error.response.data);
+				console.error("Response error status:", error.response.status);
+				console.error(
+					"Response error headers:",
+					error.response.headers,
+				);
+			}
+
+			toast.error("Failed to save quiz");
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
@@ -206,7 +295,7 @@ export default function ChapterDetailsPage() {
 							>
 								{courseTitle}
 							</button>
-							<span>🚀</span>
+							<BsRocketTakeoff className="text-[var(--color-primary)]" />
 						</>
 					)}
 					{lessonId && (
@@ -218,7 +307,7 @@ export default function ChapterDetailsPage() {
 							>
 								{lessonTitle}
 							</button>
-							<span>📖</span>
+							<BsBook className="text-[var(--color-primary)]" />
 						</>
 					)}
 					<span className="text-[var(--color-primary)]">
@@ -226,27 +315,15 @@ export default function ChapterDetailsPage() {
 					</span>
 				</div>
 
-				{/* Header */}
-				<motion.div
-					className="mb-8 flex flex-col items-center text-center"
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-				>
+				<motion.div className="mb-8 flex flex-col items-center text-center">
 					<div className="relative">
 						<img
 							src="/src/assets/code_icon_green.svg"
 							alt="Code icon"
 							className="mb-4 h-16 w-16"
 						/>
-						<motion.div
-							className="absolute -right-2 -top-2"
-							animate={{ y: [-4, 4, -4] }}
-							transition={{ repeat: Infinity, duration: 2 }}
-						>
-							✨
-						</motion.div>
 					</div>
-					<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
+					<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
 						{chapterTitle}
 					</h1>
 					<div className="mt-4 flex flex-wrap justify-center gap-4">
@@ -258,20 +335,126 @@ export default function ChapterDetailsPage() {
 							<ArrowLeft size={16} /> Back to Lesson
 						</button>
 						{isAdmin && (
-							<button
-								onClick={() =>
-									navigate(
-										`/admin/chapter/${chapterId}/add-element`,
-									)
-								}
-								className="flex transform items-center gap-2 rounded-xl bg-[var(--color-accent)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
-								type="button"
-							>
-								<Plus size={16} /> Add Element
-							</button>
+							<>
+								<button
+									onClick={() =>
+										navigate(
+											`/admin/chapter/${chapterId}/add-element`,
+										)
+									}
+									className="flex transform items-center gap-2 rounded-xl bg-[var(--color-accent)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+									type="button"
+								>
+									<Plus size={16} /> Add Element
+								</button>
+								<button
+									onClick={handleGenerateQuiz}
+									className="flex transform items-center gap-2 rounded-xl bg-purple-600 px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
+									type="button"
+								>
+									<Wand2 size={16} /> Generate Quiz with AI
+								</button>
+							</>
 						)}
 					</div>
 				</motion.div>
+
+				{/* Quiz Preview Modal */}
+				{showQuizPreview && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+						<motion.div
+							className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-6 shadow-xl"
+							initial={{ opacity: 0, scale: 0.9 }}
+							animate={{ opacity: 1, scale: 1 }}
+						>
+							<h2 className="mb-4 text-2xl font-bold text-gray-800">
+								Preview Generated Quiz
+							</h2>
+							<div className="mb-6 space-y-6">
+								{generatedQuestions.map((q, qIndex) => (
+									<div
+										key={qIndex}
+										className="rounded-lg bg-gray-50 p-4"
+									>
+										<h3 className="mb-3 text-lg font-semibold">
+											{qIndex + 1}. {q.question}
+										</h3>
+										<div className="ml-4 space-y-2">
+											{q.options.map((option, oIndex) => (
+												<div
+													key={oIndex}
+													className={`rounded-lg p-2 ${
+														oIndex ===
+														q.correctAnswerIndex
+															? "bg-green-100 text-green-800"
+															: "bg-white"
+													}`}
+												>
+													{option}
+													{oIndex ===
+														q.correctAnswerIndex && (
+														<span className="ml-2 text-green-600">
+															<CheckCircle className="ml-1 inline h-4 w-4" />
+														</span>
+													)}
+												</div>
+											))}
+										</div>
+										<p className="mt-2 text-sm text-gray-600">
+											<span className="font-semibold">
+												Explanation:
+											</span>{" "}
+											{q.explanation}
+										</p>
+									</div>
+								))}
+							</div>
+							<div className="flex justify-end gap-4">
+								<button
+									onClick={() => setShowQuizPreview(false)}
+									className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 hover:bg-gray-50"
+									type="button"
+								>
+									Cancel
+								</button>
+								<button
+									onClick={handleSaveQuiz}
+									className="rounded-lg bg-[var(--color-primary)] px-4 py-2 font-medium text-white hover:bg-[var(--color-primary-dark)]"
+									type="button"
+								>
+									Save Quiz
+								</button>
+							</div>
+						</motion.div>
+					</div>
+				)}
+
+				{/* Loading indicator for AI quiz generation */}
+				{isGeneratingQuiz && (
+					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+						<motion.div
+							className="max-w-md rounded-xl bg-white p-6 text-center shadow-xl"
+							initial={{ opacity: 0, scale: 0.9 }}
+							animate={{ opacity: 1, scale: 1 }}
+						>
+							<Wand2
+								size={32}
+								className="mx-auto mb-4 animate-pulse text-purple-600"
+							/>
+							<h2 className="mb-2 text-2xl font-bold text-gray-800">
+								Processing...
+							</h2>
+							<p className="text-gray-600">
+								The AI is analyzing chapter information and
+								generating quiz questions based on the content.
+								This may take a moment.
+							</p>
+							<div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-gray-200">
+								<div className="h-full animate-[loading_1.5s_ease-in-out_infinite] rounded-full bg-purple-600"></div>
+							</div>
+						</motion.div>
+					</div>
+				)}
 
 				{/* Chapter Content */}
 				<DragDropContext onDragEnd={handleDragEnd}>
@@ -301,6 +484,7 @@ export default function ChapterDetailsPage() {
 													{...provided.dragHandleProps}
 													className="transform rounded-2xl border bg-white p-6 shadow-md transition-all hover:shadow-xl"
 												>
+													{/* Element header with admin controls */}
 													<motion.div
 														className="mb-4 flex items-center justify-between"
 														initial={
@@ -361,7 +545,7 @@ export default function ChapterDetailsPage() {
 														)}
 													</motion.div>
 
-													{/* Element content with improved styling */}
+													{/* Element content */}
 													<motion.div
 														initial={
 															!isAdmin
@@ -417,9 +601,7 @@ export default function ChapterDetailsPage() {
 															element.formId && (
 																<div className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner">
 																	<div className="mb-4 flex items-center gap-3">
-																		<span className="text-2xl">
-																			🎯
-																		</span>
+																		<FiTarget className="h-6 w-6 text-blue-600" />
 																		<h3 className="text-xl font-semibold text-blue-800">
 																			Test
 																			Your
@@ -453,14 +635,11 @@ export default function ChapterDetailsPage() {
 																				Start
 																				Quiz
 																			</span>
-																			<span className="text-xl">
-																				🚀
-																			</span>
+																			<BsRocketTakeoff className="ml-2 h-5 w-5" />
 																		</button>
 																	)}
 																</div>
 															)}
-
 														{element.type !==
 															"Image" &&
 															element.type !==
@@ -512,7 +691,7 @@ export default function ChapterDetailsPage() {
 								transition={{ duration: 0.5 }}
 							>
 								<CheckCircle size={20} />
-								Chapter Completed! 🎉
+								Chapter Completed!
 							</motion.div>
 						)}
 					</motion.div>

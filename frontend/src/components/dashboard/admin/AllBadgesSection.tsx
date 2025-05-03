@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Medal, Trash2 } from "lucide-react";
+import { FiAward, FiStar } from "react-icons/fi";
 
 interface Badge {
 	id: string;
@@ -118,8 +119,8 @@ const AllBadgesSection = ({
 				<div className="grid grid-cols-2 gap-8">
 					<div className="space-y-4">
 						<h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-							<span className="rounded-full bg-green-100 p-1">
-								🎯
+							<span className="rounded-full bg-blue-100 p-1">
+								<FiAward className="text-blue-600" />
 							</span>
 							Course Badges
 						</h3>
@@ -139,7 +140,7 @@ const AllBadgesSection = ({
 					<div className="space-y-4">
 						<h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
 							<span className="rounded-full bg-purple-100 p-1">
-								🎖️
+								<FiStar className="text-purple-600" />
 							</span>
 							External Badges
 						</h3>

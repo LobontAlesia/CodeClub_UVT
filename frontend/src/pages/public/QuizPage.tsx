@@ -36,6 +36,7 @@ export default function TakeQuizPage() {
 	const [submitted, setSubmitted] = useState(false);
 	const [result, setResult] = useState<QuizResult | null>(null);
 	const [loading, setLoading] = useState(false);
+	const [attemptCount, setAttemptCount] = useState<number>(0); // Numărul de încercări
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -80,6 +81,7 @@ export default function TakeQuizPage() {
 
 			setResult(response.data);
 			setSubmitted(true);
+			setAttemptCount((prev) => prev + 1); // Incrementăm numărul de încercări
 
 			if (response.data.passed) {
 				toast.success("Quiz completed successfully! 🌟");
@@ -142,15 +144,8 @@ export default function TakeQuizPage() {
 				>
 					<div className="relative">
 						<HelpCircle className="mb-4 h-16 w-16 text-[var(--color-primary)]" />
-						<motion.div
-							className="absolute -right-2 -top-2"
-							animate={{ y: [-4, 4, -4] }}
-							transition={{ repeat: Infinity, duration: 2 }}
-						>
-							🎯
-						</motion.div>
 					</div>
-					<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
+					<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
 						{quiz.title}
 					</h1>
 					<p className="mt-2 text-lg text-gray-600">
@@ -166,7 +161,7 @@ export default function TakeQuizPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: idx * 0.1 }}
 							className={`transform rounded-2xl border bg-white p-6 shadow-lg transition-all hover:shadow-xl ${
-								submitted
+								submitted && attemptCount >= 3
 									? answers[idx] === q.correctAnswerIndex
 										? "border-green-500 bg-green-50"
 										: "border-red-500 bg-red-50"
@@ -190,8 +185,9 @@ export default function TakeQuizPage() {
 										key={ansIdx}
 										className={`block transform cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-1 hover:bg-gray-50 ${
 											submitted
-												? ansIdx ===
-													q.correctAnswerIndex
+												? attemptCount >= 3 &&
+													ansIdx ===
+														q.correctAnswerIndex
 													? "border-green-500 bg-green-100"
 													: answers[idx] === ansIdx
 														? "border-red-500 bg-red-100"
@@ -238,12 +234,20 @@ export default function TakeQuizPage() {
 												Excellent! Correct answer!
 											</span>
 										</div>
-									) : (
+									) : attemptCount >= 3 ? (
 										<div className="flex items-center gap-2">
 											<span className="text-xl">💡</span>
 											<span>
 												The correct answer was option{" "}
 												{q.correctAnswerIndex + 1}
+											</span>
+										</div>
+									) : (
+										<div className="flex items-center gap-2">
+											<span className="text-xl">❌</span>
+											<span>
+												Incorrect answer. Try again!
+												(Attempt {attemptCount}/3)
 											</span>
 										</div>
 									)}

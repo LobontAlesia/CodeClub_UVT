@@ -1,6 +1,7 @@
 ﻿using API.Entities;
 using API.Models;
 using API.Repositories;
+using API.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,12 +10,26 @@ namespace API.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class ChapterController(IChapterRepository chapterRepository, ILessonRepository lessonRepository) : ControllerBase
+public class ChapterController : ControllerBase
 {
+    private readonly IChapterRepository _chapterRepository;
+    private readonly ILessonRepository _lessonRepository;
+    private readonly IChapterService _chapterService;
+
+    public ChapterController(
+        IChapterRepository chapterRepository, 
+        ILessonRepository lessonRepository,
+        IChapterService chapterService)
+    {
+        _chapterRepository = chapterRepository;
+        _lessonRepository = lessonRepository;
+        _chapterService = chapterService;
+    }
+
     [HttpGet("lesson/{lessonId}")]
     public async Task<ActionResult<List<Chapter>>> GetChaptersByLessonId([FromRoute] Guid lessonId)
     {
-        var lesson = await lessonRepository.GetByIdAsync(lessonId);
+        var lesson = await _lessonRepository.GetByIdAsync(lessonId);
         if (lesson == null) return NotFound("Lesson not found");
 
         var chapters = lesson.Chapters
@@ -34,7 +49,7 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     [HttpGet("{chapterId}")]
     public async Task<ActionResult<Chapter>> GetChapterById([FromRoute] Guid chapterId)
     {
-        var chapter = await chapterRepository.GetByIdAsync(chapterId);
+        var chapter = await _chapterRepository.GetByIdAsync(chapterId);
         if (chapter == null) return NotFound("Chapter not found");
 
         return Ok(new
@@ -49,7 +64,7 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     [HttpGet("{chapterId}/elements")]
     public async Task<ActionResult> GetChapterElements([FromRoute] Guid chapterId)
     {
-        var chapter = await chapterRepository.GetByIdWithElementsAsync(chapterId);
+        var chapter = await _chapterRepository.GetByIdWithElementsAsync(chapterId);
         if (chapter == null) return NotFound("Chapter not found");
 
         return Ok(new
@@ -71,11 +86,11 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     [HttpGet("{chapterId}/hierarchy")]
     public async Task<ActionResult> GetChapterHierarchy([FromRoute] Guid chapterId)
     {
-        var chapter = await chapterRepository.GetByIdAsync(chapterId);
+        var chapter = await _chapterRepository.GetByIdAsync(chapterId);
         if (chapter == null) 
             return NotFound("Chapter not found");
 
-        var lesson = await lessonRepository.GetByIdWithCourseAsync(chapter.LessonId);
+        var lesson = await _lessonRepository.GetByIdWithCourseAsync(chapter.LessonId);
         if (lesson == null)
             return NotFound("Lesson not found");
 
@@ -93,7 +108,7 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     {
         try
         {
-            var lesson = await lessonRepository.GetByIdAsync(lessonId);
+            var lesson = await _lessonRepository.GetByIdAsync(lessonId);
             if (lesson == null) return NotFound($"Lesson with ID {lessonId} not found");
 
             // Get max index from existing chapters
@@ -108,11 +123,11 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
                 Elements = new List<ChapterElement>()
             };
 
-            await chapterRepository.CreateAsync(chapter);
+            await _chapterRepository.CreateAsync(chapter);
 
             lesson.Chapters ??= new List<Chapter>();
             lesson.Chapters.Add(chapter);
-            await lessonRepository.SaveChangesAsync();
+            await _lessonRepository.SaveChangesAsync();
 
             return Ok(chapter.Id);
         }
@@ -126,11 +141,11 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UpdateChapter([FromRoute] Guid chapterId, [FromBody] ChapterModel model)
     {
-        var chapter = await chapterRepository.GetByIdAsync(chapterId);
+        var chapter = await _chapterRepository.GetByIdAsync(chapterId);
         if (chapter == null) return NotFound("Chapter not found");
 
         chapter.Title = model.Title;
-        await chapterRepository.SaveChangesAsync();
+        await _chapterRepository.SaveChangesAsync();
 
         return Ok();
     }
@@ -139,10 +154,10 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteChapter([FromRoute] Guid chapterId)
     {
-        var chapter = await chapterRepository.GetByIdAsync(chapterId);
+        var chapter = await _chapterRepository.GetByIdAsync(chapterId);
         if (chapter == null) return NotFound("Chapter not found");
 
-        var result = await chapterRepository.DeleteAsync(chapter);
+        var result = await _chapterRepository.DeleteAsync(chapter);
         if (!result) return StatusCode(500, "Failed to delete the chapter");
 
         return Ok();
@@ -154,12 +169,35 @@ public class ChapterController(IChapterRepository chapterRepository, ILessonRepo
     {
         try
         {
-            await chapterRepository.ReorderChaptersAsync(lessonId, request.Chapters);
+            await _chapterRepository.ReorderChaptersAsync(lessonId, request.Chapters);
             return Ok();
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { message = "Error reordering chapters", error = ex.Message });
+        }
+    }
+
+    [HttpPost("{chapterId}/generate-quiz")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<List<GeneratedQuizQuestion>>> GenerateQuiz(Guid chapterId)
+    {
+        try
+        {
+            var questions = await _chapterService.GenerateQuizWithAI(chapterId);
+            return Ok(questions);
+        }
+        catch (ArgumentException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error generating quiz: {ex.Message}");
         }
     }
 }

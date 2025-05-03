@@ -80,13 +80,13 @@ const CreateLessonPage = () => {
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
-						className="flex-1 rounded bg-gray-500 py-2 font-semibold text-white hover:bg-gray-600"
+						className="flex flex-1 transform items-center justify-center gap-2 rounded-xl bg-gray-200 px-4 py-2 text-gray-700 shadow transition-all hover:-translate-y-1 hover:shadow-lg"
 					>
 						Cancel
 					</button>
 					<button
 						type="submit"
-						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
+						className="flex flex-1 transform items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
 					>
 						➕ Add Lesson
 					</button>

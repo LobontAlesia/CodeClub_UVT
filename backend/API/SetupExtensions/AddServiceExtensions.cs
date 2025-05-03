@@ -1,5 +1,6 @@
 ﻿using API.Services;
 using API.Services.Implementation;
+using API.Utils;
 
 namespace API.SetupExtensions;
 
@@ -11,5 +12,7 @@ public static class AddServiceExtensions
             .AddTransient<IUserService, UserService>()
             .AddTransient<ILearningCourseService, LearningCourseService>()
             .AddTransient<IExternalBadgeService, ExternalBadgeService>()
-            .AddTransient<IPortfolioService, PortfolioService>();
+            .AddTransient<IPortfolioService, PortfolioService>()
+            .AddTransient<IChapterService, ChapterService>()
+            .AddSingleton<OpenAIHelper>(); 
 }

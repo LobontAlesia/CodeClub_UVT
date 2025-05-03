@@ -4,7 +4,9 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
-import { ArrowLeft, Plus, GraduationCap } from "lucide-react";
+import { ArrowLeft, Plus, GraduationCap, Edit, Trash2 } from "lucide-react";
+import { FiClock, FiBook, FiBookOpen } from "react-icons/fi";
+import { BsRocketTakeoff } from "react-icons/bs";
 import api from "../../utils/api";
 
 interface Chapter {
@@ -210,7 +212,7 @@ export default function LessonDetailsPage() {
 							>
 								{courseTitle}
 							</button>
-							<span>🚀</span>
+							<BsRocketTakeoff className="text-[var(--color-primary)]" />
 						</>
 					)}
 					<span className="text-[var(--color-primary)]">
@@ -231,21 +233,18 @@ export default function LessonDetailsPage() {
 						alt="Code icon"
 						className="mb-4 h-16 w-16"
 					/>
-					<motion.div
-						className="absolute -right-2 -top-2"
-						animate={{ y: [-4, 4, -4] }}
-						transition={{ repeat: Infinity, duration: 2 }}
-					>
-						📖
-					</motion.div>
 				</div>
-				<h1 className="bg-gradient-to-r from-[var(--color-primary)] via-[#4aba7a] to-[var(--color-accent)] bg-clip-text text-5xl font-extrabold text-transparent">
+				<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
 					{lessonTitle}
 				</h1>
 				<p className="mt-2 flex items-center justify-center gap-2 text-lg text-gray-500">
-					<span>⏱️ {lessonDuration} minutes</span>
+					<span className="flex items-center">
+						<FiClock className="mr-1" /> {lessonDuration} minutes
+					</span>
 					<span>•</span>
-					<span>📚 {chapters.length} chapters</span>
+					<span className="flex items-center">
+						<FiBook className="mr-1" /> {chapters.length} chapters
+					</span>
 				</p>
 				<div className="mt-4 flex flex-wrap justify-center gap-4">
 					<button
@@ -293,7 +292,7 @@ export default function LessonDetailsPage() {
 			)}
 
 			<h2 className="mb-6 text-center text-2xl font-semibold">
-				<span className="mr-2">📚</span>
+				<FiBookOpen className="mr-2 inline text-[var(--color-primary)]" />
 				Chapters in this Lesson
 			</h2>
 
@@ -331,14 +330,14 @@ export default function LessonDetailsPage() {
 																`/chapter/${chapter.id}`,
 															)
 														}
-														className="group relative block transform overflow-hidden rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+														className="group relative block transform overflow-hidden rounded-xl bg-white p-5 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
 													>
-														<div className="flex items-center gap-4">
-															<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-lg font-bold text-white">
+														<div className="flex items-center gap-5">
+															<div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-xl font-bold text-white">
 																{chapter.index}
 															</div>
 															<div>
-																<h3 className="text-lg font-semibold group-hover:text-[var(--color-primary)]">
+																<h3 className="text-xl font-semibold group-hover:text-[var(--color-primary)]">
 																	{
 																		chapter.title
 																	}
@@ -351,7 +350,7 @@ export default function LessonDetailsPage() {
 																			<GraduationCap
 																				className="text-green-600"
 																				size={
-																					24
+																					26
 																				}
 																			/>
 																		</div>
@@ -377,7 +376,11 @@ export default function LessonDetailsPage() {
 																			className="rounded-lg bg-yellow-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-yellow-600"
 																			type="button"
 																		>
-																			✏️
+																			<Edit
+																				size={
+																					16
+																				}
+																			/>{" "}
 																			Edit
 																		</button>
 																		<button
@@ -392,7 +395,11 @@ export default function LessonDetailsPage() {
 																			className="rounded-lg bg-red-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-red-600"
 																			type="button"
 																		>
-																			🗑️
+																			<Trash2
+																				size={
+																					16
+																				}
+																			/>{" "}
 																			Delete
 																		</button>
 																	</div>

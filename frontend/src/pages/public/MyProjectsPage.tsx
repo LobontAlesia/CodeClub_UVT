@@ -5,6 +5,8 @@ import { HelpCircle } from "lucide-react";
 import api from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 import HelpTutorialModal from "../../components/HelpTutorialModal";
+import { FiAward } from "react-icons/fi";
+import { BsRocketTakeoff } from "react-icons/bs";
 
 interface Portfolio {
 	id: string;
@@ -80,38 +82,47 @@ export default function MyProjectsPage() {
 						alt="Projects icon"
 						className="mb-4 h-16 w-16"
 					/>
-					<motion.button
-						onClick={() => setIsHelpModalOpen(true)}
-						className="absolute -right-12 -top-2 transform rounded-full bg-white p-2 text-yellow-500 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
-						title="Ajutor pentru încărcarea proiectelor"
-						whileHover={{ scale: 1.1 }}
-						animate={{
-							boxShadow: [
-								"0 0 0 0 rgba(234, 179, 8, 0.7)",
-								"0 0 8px 4px rgba(234, 179, 8, 0)",
-							],
-						}}
-						transition={{
-							repeat: Infinity,
-							duration: 1.2,
-							ease: "easeInOut",
-						}}
-					>
-						<HelpCircle size={24} />
-					</motion.button>
 				</div>
 				<h1 className="text-5xl font-extrabold text-[var(--color-primary)]">
 					My Projects
 				</h1>
 				<p className="mt-2 max-w-xl text-gray-600">
-					Showcase your work and earn badges! 🏆
+					Showcase your work and earn badges!{" "}
+					<FiAward className="ml-1 inline text-amber-500" />
 				</p>
-				<button
-					onClick={() => navigate("/admin/add-project")}
-					className="mt-6 transform rounded-xl bg-[var(--color-primary)] px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
-				>
-					🚀 Add New Project
-				</button>
+				<div className="mt-6 flex items-center gap-4">
+					<button
+						onClick={() => navigate("/admin/add-project")}
+						className="transform rounded-xl bg-[var(--color-primary)] px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+					>
+						<BsRocketTakeoff className="mr-2 inline" /> Add New
+						Project
+					</button>
+					<motion.button
+						onClick={() => setIsHelpModalOpen(true)}
+						className="flex items-center gap-2 rounded-xl bg-blue-400 px-4 py-3 font-bold text-white shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+						title="Ajutor pentru încărcarea proiectelor"
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						animate={{
+							boxShadow: [
+								"0 0 0 0 rgba(99, 102, 241, 0.4)",
+								"0 0 10px 3px rgba(99, 102, 241, 0.3)",
+								"0 0 0 0 rgba(99, 102, 241, 0.4)",
+							],
+						}}
+						transition={{
+							boxShadow: {
+								repeat: Infinity,
+								duration: 2,
+								ease: "easeInOut",
+							},
+						}}
+					>
+						<HelpCircle size={20} className="drop-shadow-sm" />
+						Need Help?
+					</motion.button>
+				</div>
 
 				<div className="mt-8 flex justify-center space-x-4">
 					<button

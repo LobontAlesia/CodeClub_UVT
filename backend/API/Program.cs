@@ -4,6 +4,8 @@ using API.Repositories.Implementation;
 using API.SetupExtensions;
 using dotenv.net;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using API.Services;
+
 
 DotEnv.Load();
 
