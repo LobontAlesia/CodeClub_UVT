@@ -57,14 +57,14 @@ public class ChapterService : IChapterService
 
         try
         {
-            // Utilizăm OpenAIHelper (acum conectat la Ollama) pentru generarea quiz-urilor
+            // Utilizăm OpenAIHelper pentru generarea quiz-urilor
             var questions = await _openAIHelper.GenerateQuizQuestions(chapterContent);
             
             // Adaptăm răspunsul dacă este necesar
             // Acest cod se asigură că răspunsul respectă formatul GeneratedQuizQuestion
             foreach (var question in questions)
             {
-                // În cazul în care modelul Ollama returnează "answers" în loc de "options" 
+                // În cazul în care modelul OpenAI returnează "answers" în loc de "options" 
                 // (aceasta ar fi deja gestionată în OpenAIHelper, dar adăugăm o verificare suplimentară)
                 if (question.Options == null || !question.Options.Any())
                 {
@@ -79,7 +79,7 @@ public class ChapterService : IChapterService
                 }
             }
 
-            Console.WriteLine($"DEBUG: Generated {questions.Count} quiz questions using Ollama.");
+            Console.WriteLine($"DEBUG: Generated {questions.Count} quiz questions using OpenAI.");
 
             return questions;
         }

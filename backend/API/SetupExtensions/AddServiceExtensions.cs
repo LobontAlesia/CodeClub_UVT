@@ -14,5 +14,6 @@ public static class AddServiceExtensions
             .AddTransient<IExternalBadgeService, ExternalBadgeService>()
             .AddTransient<IPortfolioService, PortfolioService>()
             .AddTransient<IChapterService, ChapterService>()
-            .AddSingleton<OpenAIHelper>(); 
+            .AddSingleton<OpenAIHelper>()
+            .AddSingleton<OpenAIService>();  // Add as singleton since it's stateless
 }
