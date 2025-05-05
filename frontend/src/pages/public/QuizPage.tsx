@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../utils/api";
 
@@ -37,6 +37,10 @@ export default function TakeQuizPage() {
 	const [result, setResult] = useState<QuizResult | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [attemptCount, setAttemptCount] = useState<number>(0); // Numărul de încercări
+	const [hints, setHints] = useState<Record<number, string>>({});
+	const [loadingHints, setLoadingHints] = useState<Record<number, boolean>>(
+		{},
+	);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -58,6 +62,39 @@ export default function TakeQuizPage() {
 		const updated = [...answers];
 		updated[index] = answerIndex;
 		setAnswers(updated);
+	};
+
+	const handleGetHint = async (questionIndex: number, question: Question) => {
+		if (hints[questionIndex]) return; // Don't fetch a hint if we already have one
+
+		setLoadingHints((prev) => ({ ...prev, [questionIndex]: true }));
+		try {
+			// Construct the options array as expected by the API
+			const options = [
+				question.answer1,
+				question.answer2,
+				question.answer3,
+				question.answer4,
+			];
+
+			const response = await api.post("/QuizQuestion/hint", {
+				questionText: question.questionText,
+				options: options,
+			});
+
+			if (response.data?.hint) {
+				setHints((prev) => ({
+					...prev,
+					[questionIndex]: response.data.hint,
+				}));
+				toast.success("Hint received!");
+			}
+		} catch (error) {
+			console.error("Error getting hint", error);
+			toast.error("Couldn't get a hint right now. Try again later.");
+		} finally {
+			setLoadingHints((prev) => ({ ...prev, [questionIndex]: false }));
+		}
 	};
 
 	const handleSubmit = async () => {
@@ -161,19 +198,53 @@ export default function TakeQuizPage() {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: idx * 0.1 }}
 							className={`transform rounded-2xl border bg-white p-6 shadow-lg transition-all hover:shadow-xl ${
-								submitted && attemptCount >= 3
+								submitted
 									? answers[idx] === q.correctAnswerIndex
 										? "border-green-500 bg-green-50"
 										: "border-red-500 bg-red-50"
 									: ""
 							}`}
 						>
-							<p className="mb-6 text-lg font-semibold">
-								<span className="text-[var(--color-primary)]">
-									{idx + 1}.
-								</span>{" "}
-								{q.questionText}
-							</p>
+							<div className="flex justify-between">
+								<p className="mb-6 text-lg font-semibold">
+									<span className="text-[var(--color-primary)]">
+										{idx + 1}.
+									</span>{" "}
+									{q.questionText}
+								</p>
+
+								{!submitted && (
+									<button
+										onClick={() => handleGetHint(idx, q)}
+										disabled={
+											loadingHints[idx] || !!hints[idx]
+										}
+										className="flex h-8 items-center gap-1 rounded-lg bg-amber-100 px-3 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-200 disabled:opacity-50"
+										type="button"
+									>
+										{loadingHints[idx] ? (
+											<div className="h-3 w-3 animate-spin rounded-full border-b-2 border-amber-700"></div>
+										) : (
+											<Lightbulb size={14} />
+										)}
+										{hints[idx] ? "Show Hint" : "Get Hint"}
+									</button>
+								)}
+							</div>
+
+							{hints[idx] && !submitted && (
+								<motion.div
+									initial={{ opacity: 0, height: 0 }}
+									animate={{ opacity: 1, height: "auto" }}
+									className="mb-4 rounded-lg bg-amber-50 p-3 text-amber-800"
+								>
+									<div className="flex items-start gap-2">
+										<Lightbulb className="mt-1 h-5 w-5 flex-shrink-0" />
+										<p>{hints[idx]}</p>
+									</div>
+								</motion.div>
+							)}
+
 							<div className="space-y-4">
 								{[
 									q.answer1,

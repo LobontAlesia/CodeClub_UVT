@@ -22,7 +22,6 @@ interface GeneratedQuizQuestion {
 	question: string;
 	options: string[];
 	correctAnswerIndex: number;
-	explanation: string;
 }
 
 export default function ChapterDetailsPage() {
@@ -400,12 +399,6 @@ export default function ChapterDetailsPage() {
 												</div>
 											))}
 										</div>
-										<p className="mt-2 text-sm text-gray-600">
-											<span className="font-semibold">
-												Explanation:
-											</span>{" "}
-											{q.explanation}
-										</p>
 									</div>
 								))}
 							</div>
