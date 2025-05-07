@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import api from "../../utils/api";
+import CertificateModal from "../../components/CertificateModal";
 
 interface ExternalBadge {
 	id: string;
@@ -22,6 +23,8 @@ interface Portfolio {
 	fileUrl: string;
 	externalLink: string;
 	screenshotUrl: string;
+	certificateUrl?: string;
+	isScratchProject?: boolean;
 	status: "Pending" | "Approved" | "Rejected";
 	feedback: string;
 	externalBadge?: {
@@ -238,6 +241,7 @@ function ProjectReviewCard({
 		portfolio.externalBadge?.id || "",
 	);
 	const [isReviewing, setIsReviewing] = useState(false);
+	const [showCertificateModal, setShowCertificateModal] = useState(false);
 
 	const handleSubmit = async (status: "Approved" | "Rejected") => {
 		if (!feedback.trim()) {
@@ -264,6 +268,16 @@ function ProjectReviewCard({
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 		>
+			{/* Certificate Modal using the dedicated component */}
+			{portfolio?.certificateUrl && (
+				<CertificateModal
+					isOpen={showCertificateModal}
+					onClose={() => setShowCertificateModal(false)}
+					certificateUrl={portfolio.certificateUrl}
+					projectTitle={portfolio.title}
+				/>
+			)}
+
 			<div className="mb-4 flex items-center justify-between">
 				<div>
 					<h2 className="text-xl font-bold text-gray-800">
@@ -306,7 +320,19 @@ function ProjectReviewCard({
 						}
 						className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-medium text-[var(--color-primary)] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 					>
-						🌐 View Project Page
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-5 w-5"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fillRule="evenodd"
+								d="M10 18a8 8 0 100-16 8 8 0 000 16zM4.332 8.027a6.012 6.012 0 011.912-2.706C6.512 5.73 6.974 6 7.5 6A1.5 1.5 0 019 7.5V8a2 2 0 004 0 2 2 0 011.523-1.943A5.977 5.977 0 0116 10c0 .34-.028.675-.083 1H15a2 2 0 00-2 2v2.197A5.973 5.973 0 0110 16v-2a2 2 0 00-2-2 2 2 0 01-2-2 2 2 0 00-1.668-1.973z"
+								clipRule="evenodd"
+							/>
+						</svg>
+						View Project Page
 					</button>
 				)}
 				<button
@@ -320,9 +346,99 @@ function ProjectReviewCard({
 					}}
 					className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-medium text-[var(--color-primary)] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
 				>
-					📥 Download Project File
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						className="h-5 w-5"
+						viewBox="0 0 20 20"
+						fill="currentColor"
+					>
+						<path
+							fillRule="evenodd"
+							d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+							clipRule="evenodd"
+						/>
+					</svg>
+					Download Project File
 				</button>
+				{portfolio.certificateUrl && (
+					<button
+						onClick={() => setShowCertificateModal(true)}
+						className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-5 w-5"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+							<path
+								fillRule="evenodd"
+								d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+								clipRule="evenodd"
+							/>
+						</svg>
+						View Dr. Scratch Certificate
+					</button>
+				)}
 			</div>
+
+			{portfolio.isScratchProject && (
+				<div className="mb-4 rounded-md bg-blue-50 p-4">
+					<div className="flex">
+						<div className="flex-shrink-0">
+							<svg
+								className="h-5 w-5 text-blue-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+						</div>
+						<div className="ml-3">
+							<h3 className="text-sm font-medium text-blue-800">
+								Scratch Project
+							</h3>
+							<div className="mt-1 text-sm text-blue-700">
+								<p>
+									This project was created in Scratch and{" "}
+									{portfolio.certificateUrl
+										? "the student has uploaded a Dr. Scratch certificate."
+										: "doesn't have a Dr. Scratch certificate yet."}
+								</p>
+								{!portfolio.certificateUrl && (
+									<p className="mt-1 text-xs text-blue-600">
+										The student should analyze their project
+										on{" "}
+										<a
+											href="https://www.drscratch.org/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="underline"
+										>
+											Dr. Scratch
+										</a>
+										.
+									</p>
+								)}
+								{portfolio.status === "Pending" &&
+									portfolio.certificateUrl && (
+										<p className="mt-1 font-medium text-blue-800">
+											Recommendation: Award the "Scratch
+											Developer" badge for this project.
+										</p>
+									)}
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
 
 			<div className="space-y-4 rounded-lg bg-gray-50 p-4">
 				<div>
@@ -362,14 +478,42 @@ function ProjectReviewCard({
 						disabled={isReviewing}
 						className="transform rounded-lg bg-red-500 px-4 py-2 font-semibold text-white shadow transition-all hover:-translate-y-1 hover:bg-red-600 hover:shadow-lg disabled:opacity-50"
 					>
-						❌ Reject
+						<span className="flex items-center">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="mr-2 h-5 w-5"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fillRule="evenodd"
+									d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+									clipRule="evenodd"
+								/>
+							</svg>
+							Reject
+						</span>
 					</button>
 					<button
 						onClick={() => handleSubmit("Approved")}
 						disabled={isReviewing}
 						className="transform rounded-lg bg-green-500 px-4 py-2 font-semibold text-white shadow transition-all hover:-translate-y-1 hover:bg-green-600 hover:shadow-lg disabled:opacity-50"
 					>
-						✅ Approve
+						<span className="flex items-center">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								className="mr-2 h-5 w-5"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fillRule="evenodd"
+									d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+									clipRule="evenodd"
+								/>
+							</svg>
+							Approve
+						</span>
 					</button>
 				</div>
 			</div>

@@ -8,6 +8,8 @@ public class PortfolioModel
     public string FileUrl { get; set; } = string.Empty;
     public string ExternalLink { get; set; } = string.Empty;
     public string ScreenshotUrl { get; set; } = string.Empty;
+    public string CertificateUrl { get; set; } = string.Empty;
+    public bool IsScratchProject { get; set; }
     public string Status { get; set; } = "Pending";
     public string Feedback { get; set; } = string.Empty;
     public ExternalBadgeModel? ExternalBadge { get; set; }

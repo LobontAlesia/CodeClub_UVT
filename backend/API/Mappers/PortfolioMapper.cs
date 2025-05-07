@@ -28,6 +28,8 @@ public static class PortfolioMapper
                 FileUrl = string.IsNullOrEmpty(entity.FileUrl) ? string.Empty : entity.FileUrl,
                 ExternalLink = string.IsNullOrEmpty(entity.ExternalLink) ? string.Empty : entity.ExternalLink,
                 ScreenshotUrl = GetAssetUrl(entity.ScreenshotUrl),
+                CertificateUrl = string.IsNullOrEmpty(entity.CertificateUrl) ? string.Empty : entity.CertificateUrl,
+                IsScratchProject = entity.IsScratchProject,
                 Status = entity.Status ?? "Pending",
                 Feedback = entity.Feedback ?? string.Empty,
                 ExternalBadge = entity.ExternalBadge == null ? null : new ExternalBadgeModel

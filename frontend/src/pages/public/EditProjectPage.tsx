@@ -5,6 +5,7 @@ import api from "../../utils/api";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_CERTIFICATE_SIZE = 2 * 1024 * 1024; // 2MB
 
 interface Portfolio {
 	id: string;
@@ -13,6 +14,8 @@ interface Portfolio {
 	fileUrl: string;
 	externalLink: string;
 	screenshotUrl: string;
+	certificateUrl?: string;
+	isScratchProject?: boolean;
 	status: "Pending" | "Approved" | "Rejected";
 }
 
@@ -31,6 +34,14 @@ export default function EditProjectPage() {
 	const [originalScreenshotUrl, setOriginalScreenshotUrl] = useState<
 		string | null
 	>(null);
+	const [isScratchProject, setIsScratchProject] = useState(false);
+	const [certificateBase64, setCertificateBase64] = useState<string | null>(
+		null,
+	);
+	const [certificateName, setCertificateName] = useState<string | null>(null);
+	const [originalCertificateUrl, setOriginalCertificateUrl] = useState<
+		string | null
+	>(null);
 
 	useEffect(() => {
 		fetchProject();
@@ -47,6 +58,8 @@ export default function EditProjectPage() {
 			setDescription(project.description);
 			setExternalLink(project.externalLink || "");
 			setOriginalScreenshotUrl(project.screenshotUrl);
+			setIsScratchProject(project.isScratchProject || false);
+			setOriginalCertificateUrl(project.certificateUrl || null);
 		} catch (error) {
 			console.error("Error fetching project:", error);
 			toast.error("Failed to load project");
@@ -105,6 +118,41 @@ export default function EditProjectPage() {
 				const base64String = reader.result as string;
 				setFileBase64(base64String);
 				setFileName(file.name);
+
+				// Check if this is a Scratch project file (.sb3)
+				const fileExtension = file.name.split(".").pop()?.toLowerCase();
+				if (fileExtension === "sb3") {
+					setIsScratchProject(true);
+					toast.info(
+						"Scratch project detected! Please analyze your project on Dr. Scratch and upload the certificate below.",
+					);
+				} else {
+					setIsScratchProject(false);
+					setCertificateBase64(null);
+					setCertificateName(null);
+				}
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
+	const handleCertificateUpload = (
+		event: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = event.target.files?.[0];
+		if (file) {
+			if (file.size > MAX_CERTIFICATE_SIZE) {
+				toast.error(
+					`Certificate size must be less than ${MAX_CERTIFICATE_SIZE / 1024 / 1024}MB`,
+				);
+				return;
+			}
+
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				const base64String = reader.result as string;
+				setCertificateBase64(base64String);
+				setCertificateName(file.name);
 			};
 			reader.readAsDataURL(file);
 		}
@@ -145,6 +193,14 @@ export default function EditProjectPage() {
 		e.preventDefault();
 		if (!id) return;
 
+		// Check if it's a Scratch project with no certificate
+		if (isScratchProject && !certificateBase64 && !originalCertificateUrl) {
+			toast.error(
+				"For Scratch projects, you need to upload a Dr. Scratch certificate.",
+			);
+			return;
+		}
+
 		try {
 			await api.put(`/portfolio/${id}`, {
 				title,
@@ -152,6 +208,9 @@ export default function EditProjectPage() {
 				fileUrl: fileBase64 || "", // Send empty string instead of undefined
 				externalLink: externalLink || "", // Send empty string instead of undefined
 				screenshotUrl: screenshotBase64 || originalScreenshotUrl || "", // Preserve original screenshot if no new one
+				certificateUrl:
+					certificateBase64 || originalCertificateUrl || "", // Preserve original certificate if no new one
+				isScratchProject,
 				status: "Pending",
 			});
 
@@ -223,8 +282,12 @@ export default function EditProjectPage() {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
-							Update Screenshot
+							Update Screenshot of Your Completed Project
 						</label>
+						<p className="mt-1 text-sm text-gray-500">
+							Please capture a screenshot showing your completed
+							project in action or the final output.
+						</p>
 						<input
 							type="file"
 							accept="image/*"
@@ -274,6 +337,83 @@ export default function EditProjectPage() {
 							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
 						/>
 					</div>
+
+					{isScratchProject && (
+						<div className="rounded-md bg-blue-50 p-4">
+							<div className="flex">
+								<div className="flex-shrink-0">
+									<svg
+										className="h-5 w-5 text-blue-400"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+										aria-hidden="true"
+									>
+										<path
+											fillRule="evenodd"
+											d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+											clipRule="evenodd"
+										/>
+									</svg>
+								</div>
+								<div className="ml-3 flex-1 md:flex md:justify-between">
+									<p className="text-sm text-blue-700">
+										To receive a badge, please analyze your
+										Scratch project on Dr. Scratch and
+										upload the received certificate.
+									</p>
+									<p className="mt-3 text-sm md:ml-6 md:mt-0">
+										<a
+											href="https://www.drscratch.org/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
+										>
+											Go to Dr. Scratch
+											<span aria-hidden="true">
+												{" "}
+												&rarr;
+											</span>
+										</a>
+									</p>
+								</div>
+							</div>
+						</div>
+					)}
+
+					{isScratchProject && (
+						<div>
+							<label className="block text-sm font-medium text-gray-700">
+								Upload Dr. Scratch Certificate
+							</label>
+							<input
+								type="file"
+								accept=".pdf,.jpg,.jpeg,.png"
+								onChange={handleCertificateUpload}
+								className="mt-1 block w-full"
+							/>
+							{certificateName && (
+								<p className="mt-1 text-sm text-gray-600">
+									Selected certificate: {certificateName}
+								</p>
+							)}
+							{originalCertificateUrl && !certificateName && (
+								<div className="mt-2">
+									<p className="text-sm text-gray-600">
+										Existing certificate:
+										<a
+											href={originalCertificateUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="ml-2 text-blue-600 hover:underline"
+										>
+											View certificate
+										</a>
+									</p>
+								</div>
+							)}
+						</div>
+					)}
 
 					<div className="flex justify-end space-x-4">
 						<button

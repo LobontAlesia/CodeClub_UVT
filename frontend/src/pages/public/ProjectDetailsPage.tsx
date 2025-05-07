@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import api from "../../utils/api";
+import CertificateModal from "../../components/CertificateModal";
 
 interface Portfolio {
 	id: string;
@@ -12,6 +13,8 @@ interface Portfolio {
 	fileUrl: string;
 	externalLink: string;
 	screenshotUrl: string;
+	certificateUrl?: string;
+	isScratchProject?: boolean;
 	status: "Pending" | "Approved" | "Rejected";
 	feedback?: string;
 	externalBadge?: {
@@ -39,6 +42,7 @@ export default function ProjectDetailsPage() {
 	const navigate = useNavigate();
 	const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [showCertificateModal, setShowCertificateModal] = useState(false);
 
 	useEffect(() => {
 		fetchProject();
@@ -111,6 +115,16 @@ export default function ProjectDetailsPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+			{/* Certificate Modal using the dedicated component */}
+			{portfolio?.certificateUrl && (
+				<CertificateModal
+					isOpen={showCertificateModal}
+					onClose={() => setShowCertificateModal(false)}
+					certificateUrl={portfolio.certificateUrl}
+					projectTitle={portfolio.title}
+				/>
+			)}
+
 			<div className="mx-auto max-w-4xl">
 				{/* Breadcrumb navigation */}
 				<div className="mb-6">
@@ -265,7 +279,7 @@ export default function ProjectDetailsPage() {
 								href={portfolio.externalLink}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-6 py-2 font-semibold text-white transition-all hover:-translate-y-1 hover:shadow-lg"
+								className="flex items-center gap-2 rounded-lg bg-[var(--color-primary)] px-6 py-2 font-semibold text-white transition-all hover:-translate-y-1 hover:bg-white hover:text-[var(--color-primary)] hover:shadow-lg"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -306,7 +320,135 @@ export default function ProjectDetailsPage() {
 								Download Project File
 							</button>
 						)}
+						{portfolio.certificateUrl && (
+							<>
+								<button
+									onClick={() =>
+										setShowCertificateModal(true)
+									}
+									className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-5 w-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+										/>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+										/>
+									</svg>
+									View Dr. Scratch Certificate
+								</button>
+								<a
+									href={portfolio.certificateUrl}
+									download={`${portfolio.title.replace(/\s+/g, "_")}_certificate.pdf`}
+									className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 font-medium text-blue-600 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-5 w-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+										/>
+									</svg>
+									Download Certificate
+								</a>
+							</>
+						)}
 					</div>
+
+					{/* Dr. Scratch Info */}
+					{portfolio.isScratchProject && (
+						<div className="mt-6 rounded-lg bg-blue-50 p-4">
+							<div className="flex items-start">
+								<div className="flex-shrink-0">
+									<svg
+										className="h-6 w-6 text-blue-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+								</div>
+								<div className="ml-3">
+									<h3 className="text-lg font-medium text-blue-800">
+										Scratch Project
+									</h3>
+									<div className="mt-2 text-blue-700">
+										<p>
+											This project was created in Scratch
+											and{" "}
+											{portfolio.certificateUrl
+												? "has been analyzed with Dr. Scratch for programming skills assessment."
+												: "needs to be analyzed with Dr. Scratch for a complete evaluation."}
+										</p>
+
+										{portfolio.certificateUrl ? (
+											<div className="mt-2">
+												<p className="text-sm">
+													The Dr. Scratch certificate
+													is available for download
+													using the button above.
+												</p>
+											</div>
+										) : (
+											<div className="mt-2">
+												<p className="text-sm">
+													No Dr. Scratch certificate
+													has been uploaded for this
+													project.
+												</p>
+												<a
+													href="https://www.drscratch.org/"
+													target="_blank"
+													rel="noopener noreferrer"
+													className="mt-2 inline-flex items-center text-sm font-medium text-blue-600 hover:underline"
+												>
+													Visit Dr. Scratch for
+													analysis
+													<svg
+														className="ml-1 h-4 w-4"
+														fill="currentColor"
+														viewBox="0 0 20 20"
+													>
+														<path
+															fillRule="evenodd"
+															d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+															clipRule="evenodd"
+														></path>
+													</svg>
+												</a>
+											</div>
+										)}
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
 				</motion.div>
 			</div>
 		</div>

@@ -88,6 +88,8 @@ public class PortfolioService : IPortfolioService
             FileUrl = model.FileUrl?.Trim() ?? string.Empty,
             ExternalLink = model.ExternalLink?.Trim() ?? string.Empty,
             ScreenshotUrl = model.ScreenshotUrl.Trim(),
+            CertificateUrl = model.CertificateUrl?.Trim() ?? string.Empty,
+            IsScratchProject = model.IsScratchProject,
             Status = "Pending",
             Feedback = string.Empty,
             ExternalBadgeId = null
@@ -166,6 +168,8 @@ public class PortfolioService : IPortfolioService
         portfolio.FileUrl = model.FileUrl?.Trim() ?? portfolio.FileUrl;
         portfolio.ExternalLink = model.ExternalLink?.Trim() ?? portfolio.ExternalLink;
         portfolio.ScreenshotUrl = model.ScreenshotUrl.Trim();
+        portfolio.CertificateUrl = model.CertificateUrl?.Trim() ?? portfolio.CertificateUrl;
+        portfolio.IsScratchProject = model.IsScratchProject;
         
         // Reset the portfolio status, feedback and badge when updated
         portfolio.Status = "Pending";

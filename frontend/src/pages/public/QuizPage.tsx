@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { HelpCircle, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../utils/api";
+import FeedbackPopup from "../../components/quiz/FeedbackPopup";
 
 interface Question {
 	id: string;
@@ -43,6 +44,41 @@ export default function TakeQuizPage() {
 	);
 	const navigate = useNavigate();
 
+	// New state for feedback popup
+	const [feedbackPopup, setFeedbackPopup] = useState({
+		isVisible: false,
+		type: "encouragement" as
+			| "correct"
+			| "incorrect"
+			| "encouragement"
+			| "completion",
+	});
+
+	// Function to show encouragement feedback randomly during quiz
+	const showRandomEncouragement = () => {
+		// Show encouragement only if we're not already showing feedback and there's a 33% chance
+		if (!feedbackPopup.isVisible && Math.random() < 0.33) {
+			setFeedbackPopup({
+				isVisible: true,
+				type: "encouragement",
+			});
+		}
+	};
+
+	// Show initial encouragement when the quiz loads (after a short delay)
+	useEffect(() => {
+		if (quiz && !submitted) {
+			const timer = setTimeout(() => {
+				setFeedbackPopup({
+					isVisible: true,
+					type: "encouragement",
+				});
+			}, 1000);
+
+			return () => clearTimeout(timer);
+		}
+	}, [quiz]);
+
 	useEffect(() => {
 		const fetchQuiz = async () => {
 			try {
@@ -62,6 +98,12 @@ export default function TakeQuizPage() {
 		const updated = [...answers];
 		updated[index] = answerIndex;
 		setAnswers(updated);
+
+		// Occasionally show encouragement when answering
+		// Only if they've answered at least 2 questions
+		if (updated.filter((a) => a !== -1).length >= 2) {
+			showRandomEncouragement();
+		}
 	};
 
 	const handleGetHint = async (questionIndex: number, question: Question) => {
@@ -120,6 +162,12 @@ export default function TakeQuizPage() {
 			setSubmitted(true);
 			setAttemptCount((prev) => prev + 1); // Incrementăm numărul de încercări
 
+			// Show completion feedback popup
+			setFeedbackPopup({
+				isVisible: true,
+				type: response.data.passed ? "completion" : "incorrect",
+			});
+
 			if (response.data.passed) {
 				toast.success("Quiz completed successfully! 🌟");
 
@@ -155,6 +203,14 @@ export default function TakeQuizPage() {
 		setResult(null);
 	};
 
+	// Function to handle question-level feedback
+	const handleAnswerFeedback = (isCorrect: boolean) => {
+		setFeedbackPopup({
+			isVisible: true,
+			type: isCorrect ? "correct" : "incorrect",
+		});
+	};
+
 	if (!quiz) {
 		return (
 			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd]">
@@ -173,6 +229,18 @@ export default function TakeQuizPage() {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+			{/* Feedback Popup Component */}
+			<FeedbackPopup
+				isVisible={feedbackPopup.isVisible}
+				type={feedbackPopup.type}
+				onClose={() =>
+					setFeedbackPopup((prev) => ({ ...prev, isVisible: false }))
+				}
+				autoCloseDelay={
+					feedbackPopup.type === "encouragement" ? 3000 : 4000
+				}
+			/>
+
 			<div className="mx-auto max-w-4xl">
 				<motion.div
 					className="mb-8 flex flex-col items-center text-center"
@@ -227,7 +295,9 @@ export default function TakeQuizPage() {
 										) : (
 											<Lightbulb size={14} />
 										)}
-										{hints[idx] ? "Show Hint" : "Get Hint"}
+										{hints[idx]
+											? "Show Hint With AI"
+											: "Get Hint With AI"}
 									</button>
 								)}
 							</div>
@@ -256,9 +326,8 @@ export default function TakeQuizPage() {
 										key={ansIdx}
 										className={`block transform cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-1 hover:bg-gray-50 ${
 											submitted
-												? attemptCount >= 3 &&
-													ansIdx ===
-														q.correctAnswerIndex
+												? ansIdx ===
+													q.correctAnswerIndex
 													? "border-green-500 bg-green-100"
 													: answers[idx] === ansIdx
 														? "border-red-500 bg-red-100"
@@ -297,6 +366,12 @@ export default function TakeQuizPage() {
 											? "bg-green-100 text-green-800"
 											: "bg-red-100 text-red-800"
 									}`}
+									onClick={() =>
+										handleAnswerFeedback(
+											answers[idx] ===
+												q.correctAnswerIndex,
+										)
+									}
 								>
 									{answers[idx] === q.correctAnswerIndex ? (
 										<div className="flex items-center gap-2">
