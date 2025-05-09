@@ -226,8 +226,18 @@ export default function FeedbackPopup({
 										animate={{
 											opacity: [0, 1, 0],
 											scale: [0.5, 1.2, 0.8],
-											x: [0, (index - 1) * 30 - 15],
-											y: [-10, -50 - index * 15],
+											// Position alternating left and right
+											x:
+												index % 2 === 0
+													? [
+															-60 - index * 5,
+															-75 - index * 10,
+														] // Left side - moved further left
+													: [
+															30 + index * 5,
+															45 + index * 10,
+														], // Right side
+											y: [-5, -20 - index * 5],
 										}}
 										transition={{
 											duration: 2,
@@ -236,8 +246,8 @@ export default function FeedbackPopup({
 											delay: index * 0.4,
 										}}
 										style={{
-											top: "40%",
-											left: "50%",
+											top: "40%", // Positioned at middle of robot
+											left: "50%", // Center horizontally initially
 										}}
 									>
 										{emoji}

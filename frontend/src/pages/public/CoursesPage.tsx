@@ -6,6 +6,8 @@ import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import { Star, Trophy, Search, X } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import Container from "../../components/layout/Container";
+import ResponsiveGrid from "../../components/layout/ResponsiveGrid";
 
 interface Course {
 	id: string;
@@ -30,6 +32,7 @@ const CoursesPage = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [availableTags, setAvailableTags] = useState<string[]>([]);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
+	const [loading, setLoading] = useState(true);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -62,6 +65,7 @@ const CoursesPage = () => {
 
 	useEffect(() => {
 		const fetchCourses = async () => {
+			setLoading(true);
 			try {
 				const token = localStorage.getItem("token");
 				const [coursesResponse, progressResponse] = await Promise.all([
@@ -89,6 +93,8 @@ const CoursesPage = () => {
 			} catch (error) {
 				console.error(error);
 				toast.error("Failed to load courses");
+			} finally {
+				setLoading(false);
 			}
 		};
 
@@ -177,174 +183,181 @@ const CoursesPage = () => {
 		}
 	};
 
+	if (loading) {
+		return (
+			<div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#f4fff7] to-white p-4">
+				<div className="h-12 w-12 animate-spin rounded-full border-b-2 border-[var(--color-primary)]" />
+			</div>
+		);
+	}
+
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
-			<motion.div
-				className="mb-12 flex flex-col items-center text-center"
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-			>
-				<img
-					src="/src/assets/bracket-icons-search.svg"
-					alt="Search icon"
-					className="mb-4 h-16 w-16"
-				/>
-				<h1 className="text-5xl font-extrabold text-[var(--color-primary)]">
-					Explore Courses
-				</h1>
-				<p className="mt-2 max-w-xl text-gray-600">
-					Choose your next adventure and continue learning.
-				</p>
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] py-6 sm:py-10">
+			<Container>
+				<motion.div
+					className="mb-8 flex flex-col items-center text-center sm:mb-12"
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+				>
+					<img
+						src="/src/assets/bracket-icons-search.svg"
+						alt="Search icon"
+						className="mb-3 h-12 w-12 sm:mb-4 sm:h-16 sm:w-16"
+					/>
+					<h1 className="text-3xl font-extrabold text-[var(--color-primary)] sm:text-4xl md:text-5xl">
+						Explore Courses
+					</h1>
+					<p className="mt-2 max-w-xl text-sm text-gray-600 sm:text-base">
+						Choose your next adventure and continue learning.
+					</p>
 
-				{/* Search and Filter Section */}
-				<div className="mt-8 w-full max-w-4xl">
-					<div className="relative mb-4">
-						<input
-							type="text"
-							placeholder="Search courses..."
-							value={searchQuery}
-							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-						/>
-						<Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+					{/* Search and Filter Section */}
+					<div className="mt-6 w-full max-w-4xl sm:mt-8">
+						<div className="relative mb-4">
+							<input
+								type="text"
+								placeholder="Search courses..."
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+								className="w-full rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							/>
+							<Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+						</div>
+
+						<div className="flex flex-wrap gap-2">
+							{availableTags.map((tag) => (
+								<button
+									key={tag}
+									onClick={() => handleTagSelect(tag)}
+									className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium transition-colors sm:px-3 sm:text-sm ${
+										selectedTags.includes(tag)
+											? "bg-[var(--color-secondary)] text-white"
+											: "bg-amber-500 text-white"
+									}`}
+								>
+									{tag}
+									{selectedTags.includes(tag) && (
+										<X className="h-3 w-3 text-white" />
+									)}
+								</button>
+							))}
+						</div>
 					</div>
+				</motion.div>
 
-					<div className="flex flex-wrap gap-2">
-						{availableTags.map((tag) => (
-							<button
-								key={tag}
-								onClick={() => handleTagSelect(tag)}
-								className={`flex items-center gap-1 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-									selectedTags.includes(tag)
-										? "bg-[var(--color-secondary)] text-white"
-										: "bg-amber-500 text-white"
-								}`}
-							>
-								{tag}
-								{selectedTags.includes(tag) && (
-									<X className="h-3 w-3 text-white" />
-								)}
-							</button>
-						))}
-					</div>
-				</div>
-			</motion.div>
-
-			{filteredCourses.length === 0 ? (
-				<p className="text-center text-gray-500">
-					No courses available.
-				</p>
-			) : (
-				<DragDropContext onDragEnd={handleDragEnd}>
-					<Droppable droppableId="courses" direction="horizontal">
-						{(provided) => (
-							<div
-								{...provided.droppableProps}
-								ref={provided.innerRef}
-								className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
-							>
-								{filteredCourses.map((course, index) => (
-									<Draggable
-										key={course.id}
-										draggableId={course.id}
-										index={index}
-										isDragDisabled={!isAdmin}
-									>
-										{(provided, snapshot) => (
-											<div
-												ref={provided.innerRef}
-												{...provided.draggableProps}
-												{...provided.dragHandleProps}
-												onClick={() =>
-													handleClick(course.id)
-												}
-												className={`group cursor-pointer rounded-3xl bg-white p-6 shadow-xl transition-transform hover:-translate-y-1 hover:shadow-2xl ${
-													snapshot.isDragging
-														? "shadow-2xl"
-														: ""
-												}`}
-											>
-												<div className="relative mb-4 h-32 w-full overflow-hidden rounded-2xl">
-													<div
-														className={`absolute inset-0 bg-gradient-to-r ${
-															course.completed
-																? "from-green-300 to-blue-300"
-																: "from-[#d6ffe2] to-[#e1f4ff]"
-														}`}
-													/>
-													{course.completed && (
-														<div className="absolute inset-0 flex items-center justify-center">
-															<Trophy className="h-16 w-16 text-white drop-shadow-lg" />
-														</div>
-													)}
-													<div className="absolute bottom-2 right-2 flex items-center gap-1">
-														{Array.from({
-															length:
-																course.level ===
-																"Beginner"
-																	? 1
-																	: course.level ===
-																		  "Intermediate"
-																		? 2
-																		: 3,
-														}).map((_, i) => (
-															<Star
-																key={i}
-																className="h-4 w-4 text-yellow-400 drop-shadow"
-																fill="#FBBF24"
-															/>
-														))}
-													</div>
-												</div>
-												<h2 className="mb-2 text-2xl font-bold text-gray-800 group-hover:text-[var(--color-primary)]">
-													{course.title}
-												</h2>
-												<p className="mb-4 text-sm text-gray-600">
-													{course.description.length >
-													100
-														? course.description.slice(
-																0,
-																100,
-															) + "..."
-														: course.description}
-												</p>
-												<div className="flex items-center justify-between text-sm text-gray-500">
-													<span className="rounded-full bg-blue-100 px-3 py-1 font-semibold text-blue-600">
-														{course.level}
-													</span>
-													<span>
-														{course.duration}h
-													</span>
-												</div>
-												{isAdmin && (
-													<p className="mt-2 text-xs font-medium">
-														{course.isPublished ? (
-															<span className="text-green-600">
-																Published
-															</span>
-														) : (
-															<span className="text-red-500">
-																Unpublished
-															</span>
+				{filteredCourses.length === 0 ? (
+					<p className="text-center text-gray-500">
+						No courses available.
+					</p>
+				) : (
+					<DragDropContext onDragEnd={handleDragEnd}>
+						<Droppable droppableId="courses">
+							{(provided) => (
+								<ResponsiveGrid
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									className="mb-6"
+									cols={{ xs: 1, sm: 2, lg: 3 }}
+									gap="large"
+								>
+									{filteredCourses.map((course, index) => (
+										<Draggable
+											key={course.id}
+											draggableId={course.id}
+											index={index}
+											isDragDisabled={!isAdmin}
+										>
+											{(provided, snapshot) => (
+												<div
+													ref={provided.innerRef}
+													{...provided.draggableProps}
+													{...provided.dragHandleProps}
+													onClick={() =>
+														handleClick(course.id)
+													}
+													className={`group cursor-pointer rounded-2xl bg-white p-4 shadow-lg transition-transform hover:-translate-y-1 hover:shadow-xl sm:rounded-3xl sm:p-6 ${
+														snapshot.isDragging
+															? "shadow-xl"
+															: ""
+													}`}
+												>
+													<div className="relative mb-3 h-24 w-full overflow-hidden rounded-xl sm:mb-4 sm:h-32 sm:rounded-2xl">
+														<div
+															className={`absolute inset-0 bg-gradient-to-r ${
+																course.completed
+																	? "from-green-300 to-blue-300"
+																	: "from-[#d6ffe2] to-[#e1f4ff]"
+															}`}
+														/>
+														{course.completed && (
+															<div className="absolute inset-0 flex items-center justify-center">
+																<Trophy className="h-10 w-10 text-white drop-shadow-lg sm:h-16 sm:w-16" />
+															</div>
 														)}
+														<div className="absolute bottom-2 right-2 flex items-center gap-1">
+															{Array.from({
+																length:
+																	course.level ===
+																	"Beginner"
+																		? 1
+																		: course.level ===
+																			  "Intermediate"
+																			? 2
+																			: 3,
+															}).map((_, i) => (
+																<Star
+																	key={i}
+																	className="h-3 w-3 text-yellow-400 drop-shadow sm:h-4 sm:w-4"
+																	fill="#FBBF24"
+																/>
+															))}
+														</div>
+													</div>
+													<h2 className="mb-2 line-clamp-2 text-lg font-bold text-gray-800 group-hover:text-[var(--color-primary)] sm:text-xl md:text-2xl">
+														{course.title}
+													</h2>
+													<p className="mb-3 line-clamp-3 text-xs text-gray-600 sm:mb-4 sm:text-sm">
+														{course.description}
 													</p>
-												)}
-												{course.completed &&
-													!isAdmin && (
-														<p className="mt-2 text-sm font-medium text-green-600">
-															✨ Course Completed!
+													<div className="flex items-center justify-between text-xs text-gray-500 sm:text-sm">
+														<span className="rounded-full bg-blue-100 px-2 py-0.5 font-semibold text-blue-600 sm:px-3 sm:py-1">
+															{course.level}
+														</span>
+														<span>
+															{course.duration}h
+														</span>
+													</div>
+													{isAdmin && (
+														<p className="mt-2 text-xs font-medium">
+															{course.isPublished ? (
+																<span className="text-green-600">
+																	Published
+																</span>
+															) : (
+																<span className="text-red-500">
+																	Unpublished
+																</span>
+															)}
 														</p>
 													)}
-											</div>
-										)}
-									</Draggable>
-								))}
-								{provided.placeholder}
-							</div>
-						)}
-					</Droppable>
-				</DragDropContext>
-			)}
+													{course.completed &&
+														!isAdmin && (
+															<p className="mt-2 text-xs font-medium text-green-600 sm:text-sm">
+																✨ Course
+																Completed!
+															</p>
+														)}
+												</div>
+											)}
+										</Draggable>
+									))}
+									{provided.placeholder}
+								</ResponsiveGrid>
+							)}
+						</Droppable>
+					</DragDropContext>
+				)}
+			</Container>
 		</div>
 	);
 };

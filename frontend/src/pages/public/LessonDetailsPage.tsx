@@ -8,6 +8,8 @@ import { ArrowLeft, Plus, GraduationCap, Edit, Trash2 } from "lucide-react";
 import { FiClock, FiBook, FiBookOpen } from "react-icons/fi";
 import { BsRocketTakeoff } from "react-icons/bs";
 import api from "../../utils/api";
+import Container from "../../components/layout/Container";
+import ResponsiveCard from "../../components/layout/ResponsiveCard";
 
 interface Chapter {
 	id: string;
@@ -199,225 +201,239 @@ export default function LessonDetailsPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
-			<div className="mx-auto mb-4 max-w-4xl">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] py-6 sm:py-10">
+			<Container>
 				{/* Breadcrumb navigation */}
-				<div className="flex items-center gap-2 text-sm text-gray-600">
-					{courseId && (
-						<>
-							<button
-								onClick={() => navigate(`/course/${courseId}`)}
-								className="transition-colors hover:text-black"
-								type="button"
-							>
-								{courseTitle}
-							</button>
-							<BsRocketTakeoff className="text-[var(--color-primary)]" />
-						</>
-					)}
-					<span className="text-[var(--color-primary)]">
-						{lessonTitle}
-					</span>
-				</div>
-			</div>
-
-			{/* Header with navigation */}
-			<motion.div
-				className="mb-8 flex flex-col items-center text-center"
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-			>
-				<div className="relative">
-					<img
-						src="/src/assets/code_icon_green.svg"
-						alt="Code icon"
-						className="mb-4 h-16 w-16"
-					/>
-				</div>
-				<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
-					{lessonTitle}
-				</h1>
-				<p className="mt-2 flex items-center justify-center gap-2 text-lg text-gray-500">
-					<span className="flex items-center">
-						<FiClock className="mr-1" /> {lessonDuration} minutes
-					</span>
-					<span>•</span>
-					<span className="flex items-center">
-						<FiBook className="mr-1" /> {chapters.length} chapters
-					</span>
-				</p>
-				<div className="mt-4 flex flex-wrap justify-center gap-4">
-					<button
-						onClick={() => navigate(`/course/${courseId}`)}
-						className="flex transform items-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
-						type="button"
-					>
-						<ArrowLeft size={16} /> Back to Course
-					</button>
-					{isAdmin && (
-						<button
-							onClick={() =>
-								navigate(
-									`/admin/lesson/${lessonId}/add-chapter`,
-								)
-							}
-							className="flex transform items-center gap-2 rounded-xl bg-[var(--color-accent)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
-							type="button"
-						>
-							<Plus size={16} /> Add Chapter
-						</button>
-					)}
-				</div>
-			</motion.div>
-
-			{/* Progress bar for students */}
-			{!isAdmin && chapters.length > 0 && (
-				<div className="mx-auto mb-10 max-w-xl overflow-hidden rounded-xl bg-white p-6 shadow-lg">
-					<div className="mb-2 flex justify-between">
-						<span className="text-sm font-medium">
-							Your Progress
-						</span>
-						<span className="text-sm font-medium">
-							{progress.completedChapters} /{" "}
-							{progress.totalChapters} chapters
+				<div className="mb-4">
+					<div className="flex items-center gap-2 text-sm text-gray-600">
+						{courseId && (
+							<>
+								<button
+									onClick={() =>
+										navigate(`/course/${courseId}`)
+									}
+									className="transition-colors hover:text-black"
+									type="button"
+								>
+									{courseTitle}
+								</button>
+								<BsRocketTakeoff className="text-[var(--color-primary)]" />
+							</>
+						)}
+						<span className="truncate text-[var(--color-primary)]">
+							{lessonTitle}
 						</span>
 					</div>
-					<div className="h-4 w-full overflow-hidden rounded-full bg-gray-100">
-						<div
-							className="h-4 rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
-							style={{ width: `${progress.progressPercentage}%` }}
+				</div>
+
+				{/* Header with navigation */}
+				<motion.div
+					className="mb-6 flex flex-col items-center text-center sm:mb-8"
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+				>
+					<div className="relative">
+						<img
+							src="/src/assets/code_icon_green.svg"
+							alt="Code icon"
+							className="mb-4 h-12 w-12 sm:h-16 sm:w-16"
 						/>
 					</div>
-				</div>
-			)}
-
-			<h2 className="mb-6 text-center text-2xl font-semibold">
-				<FiBookOpen className="mr-2 inline text-[var(--color-primary)]" />
-				Chapters in this Lesson
-			</h2>
-
-			{/* Chapters List */}
-			<div className="mx-auto max-w-2xl">
-				<DragDropContext onDragEnd={handleDragEnd}>
-					<Droppable droppableId="chapters">
-						{(provided) => (
-							<div
-								{...provided.droppableProps}
-								ref={provided.innerRef}
-								className="space-y-4"
+					<h1 className="bg-[var(--color-primary)] bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
+						{lessonTitle}
+					</h1>
+					<p className="mt-2 flex flex-wrap items-center justify-center gap-2 text-base text-gray-500 sm:text-lg">
+						<span className="flex items-center">
+							<FiClock className="mr-1" /> {lessonDuration}{" "}
+							minutes
+						</span>
+						<span>•</span>
+						<span className="flex items-center">
+							<FiBook className="mr-1" /> {chapters.length}{" "}
+							chapters
+						</span>
+					</p>
+					<div className="mt-4 flex flex-wrap justify-center gap-3 sm:gap-4">
+						<button
+							onClick={() => navigate(`/course/${courseId}`)}
+							className="flex transform items-center gap-2 rounded-lg bg-[var(--color-primary)] px-3 py-1.5 text-sm text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg sm:rounded-xl sm:px-4 sm:py-2 sm:text-base"
+							type="button"
+						>
+							<ArrowLeft size={16} /> Back to Course
+						</button>
+						{isAdmin && (
+							<button
+								onClick={() =>
+									navigate(
+										`/admin/lesson/${lessonId}/add-chapter`,
+									)
+								}
+								className="flex transform items-center gap-2 rounded-lg bg-[var(--color-accent)] px-3 py-1.5 text-sm text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg sm:rounded-xl sm:px-4 sm:py-2 sm:text-base"
+								type="button"
 							>
-								{chapters.length === 0 ? (
-									<p className="text-center text-gray-500">
-										No chapters available yet.
-									</p>
-								) : (
-									chapters.map((chapter, index) => (
-										<Draggable
-											key={chapter.id}
-											draggableId={chapter.id}
-											index={index}
-											isDragDisabled={!isAdmin}
-										>
-											{(provided) => (
-												<div
-													ref={provided.innerRef}
-													{...provided.draggableProps}
-													{...provided.dragHandleProps}
-												>
+								<Plus size={16} /> Add Chapter
+							</button>
+						)}
+					</div>
+				</motion.div>
+
+				{/* Progress bar for students */}
+				{!isAdmin && chapters.length > 0 && (
+					<ResponsiveCard className="mx-auto mb-6 max-w-xl sm:mb-10">
+						<div className="mb-2 flex justify-between">
+							<span className="text-xs font-medium sm:text-sm">
+								Your Progress
+							</span>
+							<span className="text-xs font-medium sm:text-sm">
+								{progress.completedChapters} /{" "}
+								{progress.totalChapters} chapters
+							</span>
+						</div>
+						<div className="h-3 w-full overflow-hidden rounded-full bg-gray-100 sm:h-4">
+							<div
+								className="h-full rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] transition-all duration-500"
+								style={{
+									width: `${progress.progressPercentage}%`,
+								}}
+							/>
+						</div>
+					</ResponsiveCard>
+				)}
+
+				<h2 className="mb-4 text-center text-xl font-semibold sm:mb-6 sm:text-2xl">
+					<FiBookOpen className="mr-2 inline text-[var(--color-primary)]" />
+					Chapters in this Lesson
+				</h2>
+
+				{/* Chapters List */}
+				<div className="mx-auto max-w-2xl">
+					<DragDropContext onDragEnd={handleDragEnd}>
+						<Droppable droppableId="chapters">
+							{(provided) => (
+								<div
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									className="space-y-3 sm:space-y-4"
+								>
+									{chapters.length === 0 ? (
+										<p className="text-center text-gray-500">
+											No chapters available yet.
+										</p>
+									) : (
+										chapters.map((chapter, index) => (
+											<Draggable
+												key={chapter.id}
+												draggableId={chapter.id}
+												index={index}
+												isDragDisabled={!isAdmin}
+											>
+												{(provided) => (
 													<div
-														onClick={() =>
-															navigate(
-																`/chapter/${chapter.id}`,
-															)
-														}
-														className="group relative block transform overflow-hidden rounded-xl bg-white p-5 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg"
+														ref={provided.innerRef}
+														{...provided.draggableProps}
+														{...provided.dragHandleProps}
 													>
-														<div className="flex items-center gap-5">
-															<div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-primary)] text-xl font-bold text-white">
-																{chapter.index}
-															</div>
-															<div>
-																<h3 className="text-xl font-semibold group-hover:text-[var(--color-primary)]">
+														<div
+															onClick={() =>
+																navigate(
+																	`/chapter/${chapter.id}`,
+																)
+															}
+															className="group relative block transform overflow-hidden rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-1 hover:shadow-lg sm:p-5"
+														>
+															<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+																<div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-primary)] text-lg font-bold text-white sm:h-12 sm:w-12 sm:text-xl">
 																	{
-																		chapter.title
+																		chapter.index
 																	}
-																</h3>
-															</div>
-															<div className="ml-auto flex items-center gap-2">
-																{!isAdmin &&
-																	chapter.isCompleted && (
-																		<div className="animate-bounce">
-																			<GraduationCap
-																				className="text-green-600"
-																				size={
-																					26
-																				}
-																			/>
+																</div>
+																<div>
+																	<h3 className="text-lg font-semibold group-hover:text-[var(--color-primary)] sm:text-xl">
+																		{
+																			chapter.title
+																		}
+																	</h3>
+																</div>
+																<div className="mt-2 flex items-center justify-end gap-2 sm:ml-auto sm:mt-0 sm:justify-normal">
+																	{!isAdmin &&
+																		chapter.isCompleted && (
+																			<div className="animate-bounce">
+																				<GraduationCap
+																					className="text-green-600"
+																					size={
+																						20
+																					}
+																				/>
+																			</div>
+																		)}
+																	{isAdmin && (
+																		<div
+																			className="flex transform gap-2 sm:hidden sm:group-hover:flex"
+																			onClick={(
+																				e,
+																			) =>
+																				e.stopPropagation()
+																			}
+																		>
+																			<button
+																				onClick={(
+																					e,
+																				) => {
+																					e.stopPropagation();
+																					navigate(
+																						`/admin/chapter/${chapter.id}/edit`,
+																					);
+																				}}
+																				className="rounded-lg bg-yellow-500 px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-yellow-600 sm:text-sm"
+																				type="button"
+																			>
+																				<Edit
+																					size={
+																						14
+																					}
+																				/>{" "}
+																				<span className="hidden sm:inline">
+																					Edit
+																				</span>
+																			</button>
+																			<button
+																				onClick={(
+																					e,
+																				) => {
+																					e.stopPropagation();
+																					handleDeleteChapter(
+																						chapter.id,
+																					);
+																				}}
+																				className="rounded-lg bg-red-500 px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-red-600 sm:text-sm"
+																				type="button"
+																			>
+																				<Trash2
+																					size={
+																						14
+																					}
+																				/>{" "}
+																				<span className="hidden sm:inline">
+																					Delete
+																				</span>
+																			</button>
 																		</div>
 																	)}
-																{isAdmin && (
-																	<div
-																		className="hidden transform gap-2 group-hover:flex"
-																		onClick={(
-																			e,
-																		) =>
-																			e.stopPropagation()
-																		}
-																	>
-																		<button
-																			onClick={(
-																				e,
-																			) => {
-																				e.stopPropagation();
-																				navigate(
-																					`/admin/chapter/${chapter.id}/edit`,
-																				);
-																			}}
-																			className="rounded-lg bg-yellow-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-yellow-600"
-																			type="button"
-																		>
-																			<Edit
-																				size={
-																					16
-																				}
-																			/>{" "}
-																			Edit
-																		</button>
-																		<button
-																			onClick={(
-																				e,
-																			) => {
-																				e.stopPropagation();
-																				handleDeleteChapter(
-																					chapter.id,
-																				);
-																			}}
-																			className="rounded-lg bg-red-500 px-3 py-1 text-sm font-bold text-white transition-colors hover:bg-red-600"
-																			type="button"
-																		>
-																			<Trash2
-																				size={
-																					16
-																				}
-																			/>{" "}
-																			Delete
-																		</button>
-																	</div>
-																)}
+																</div>
 															</div>
 														</div>
 													</div>
-												</div>
-											)}
-										</Draggable>
-									))
-								)}
-								{provided.placeholder}
-							</div>
-						)}
-					</Droppable>
-				</DragDropContext>
-			</div>
+												)}
+											</Draggable>
+										))
+									)}
+									{provided.placeholder}
+								</div>
+							)}
+						</Droppable>
+					</DragDropContext>
+				</div>
+			</Container>
 		</div>
 	);
 }

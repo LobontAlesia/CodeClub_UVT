@@ -191,20 +191,20 @@ export default function AddProjectPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-3 py-6 sm:px-6 sm:py-10">
 			<div className="mx-auto max-w-2xl">
-				<div className="mb-8 text-center">
-					<h1 className="text-4xl font-bold text-[var(--color-primary)]">
+				<div className="mb-6 text-center sm:mb-8">
+					<h1 className="text-2xl font-bold text-[var(--color-primary)] sm:text-4xl">
 						Add New Project
 					</h1>
-					<p className="mt-2 text-gray-600">
+					<p className="mt-2 text-sm text-gray-600 sm:text-base">
 						Create a new project to showcase your work
 					</p>
 				</div>
 
 				<form
 					onSubmit={handleSubmit}
-					className="space-y-6 rounded-xl bg-white p-8 shadow-lg"
+					className="space-y-4 rounded-xl bg-white p-4 shadow-lg sm:space-y-6 sm:p-8"
 				>
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
@@ -214,7 +214,7 @@ export default function AddProjectPage() {
 							type="text"
 							value={title}
 							onChange={(e) => setTitle(e.target.value)}
-							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
 							required
 						/>
 					</div>
@@ -227,7 +227,7 @@ export default function AddProjectPage() {
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 							rows={4}
-							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
 							required
 						/>
 					</div>
@@ -236,7 +236,7 @@ export default function AddProjectPage() {
 						<label className="block text-sm font-medium text-gray-700">
 							Upload Screenshot of Your Completed Project
 						</label>
-						<p className="mt-1 text-sm text-gray-500">
+						<p className="mt-1 text-xs text-gray-500 sm:text-sm">
 							Please capture a screenshot showing your completed
 							project in action or the final output.
 						</p>
@@ -244,7 +244,7 @@ export default function AddProjectPage() {
 							type="file"
 							accept="image/*"
 							onChange={handleScreenshotUpload}
-							className="mt-1 block w-full"
+							className="mt-1 block w-full text-sm sm:text-base"
 							required
 						/>
 						{screenshotBase64 && (
@@ -252,7 +252,7 @@ export default function AddProjectPage() {
 								<img
 									src={screenshotBase64}
 									alt="Screenshot Preview"
-									className="h-32 rounded shadow"
+									className="h-24 rounded shadow sm:h-32"
 								/>
 							</div>
 						)}
@@ -266,19 +266,19 @@ export default function AddProjectPage() {
 							type="file"
 							accept=".py,.cpp,.zip,.sb3,.html,.js,.css,.pdf,.png,.jpg,.jpeg,.svg,.txt"
 							onChange={handleFileUpload}
-							className="mt-1 block w-full"
+							className="mt-1 block w-full text-sm sm:text-base"
 						/>
 						{fileName && (
-							<p className="mt-1 text-sm text-gray-600">
+							<p className="mt-1 text-xs text-gray-600 sm:text-sm">
 								Selected file: {fileName}
 							</p>
 						)}
 					</div>
 
 					{isScratchProject && (
-						<div className="rounded-md bg-blue-50 p-4">
-							<div className="flex">
-								<div className="flex-shrink-0">
+						<div className="rounded-md bg-blue-50 p-3 sm:p-4">
+							<div className="flex flex-col sm:flex-row">
+								<div className="mb-2 flex-shrink-0 sm:mb-0">
 									<svg
 										className="h-5 w-5 text-blue-400"
 										xmlns="http://www.w3.org/2000/svg"
@@ -293,13 +293,13 @@ export default function AddProjectPage() {
 										/>
 									</svg>
 								</div>
-								<div className="ml-3 flex-1 md:flex md:justify-between">
-									<p className="text-sm text-blue-700">
+								<div className="flex-1 sm:ml-3 md:flex md:flex-col md:justify-between lg:flex-row">
+									<p className="text-xs text-blue-700 sm:text-sm">
 										To receive a badge, please analyze your
 										Scratch project on Dr. Scratch and
 										upload the received certificate.
 									</p>
-									<p className="mt-3 text-sm md:ml-6 md:mt-0">
+									<p className="mt-2 text-xs sm:mt-3 sm:text-sm md:lg:mt-0 md:lg:ml-6">
 										<a
 											href="https://www.drscratch.org/"
 											target="_blank"
@@ -327,11 +327,11 @@ export default function AddProjectPage() {
 								type="file"
 								accept="application/pdf,image/*"
 								onChange={handleCertificateUpload}
-								className="mt-1 block w-full"
+								className="mt-1 block w-full text-sm sm:text-base"
 								required={isScratchProject}
 							/>
 							{certificateName && (
-								<p className="mt-1 text-sm text-gray-600">
+								<p className="mt-1 text-xs text-gray-600 sm:text-sm">
 									Selected certificate: {certificateName}
 								</p>
 							)}
@@ -346,21 +346,21 @@ export default function AddProjectPage() {
 							type="url"
 							value={externalLink}
 							onChange={(e) => setExternalLink(e.target.value)}
-							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
 						/>
 					</div>
 
-					<div className="flex justify-end space-x-4">
+					<div className="flex flex-col space-y-2 pt-2 sm:flex-row sm:justify-end sm:space-x-4 sm:space-y-0">
 						<button
 							type="button"
 							onClick={() => navigate("/my-projects")}
-							className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+							className="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 sm:w-auto"
 						>
 							Cancel
 						</button>
 						<button
 							type="submit"
-							className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:border hover:border-[var(--color-primary)] hover:bg-white hover:text-[var(--color-primary)]"
+							className="w-full rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:border hover:border-[var(--color-primary)] hover:bg-white hover:text-[var(--color-primary)] sm:w-auto"
 						>
 							Add Project
 						</button>

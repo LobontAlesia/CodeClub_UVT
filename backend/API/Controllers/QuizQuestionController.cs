@@ -43,8 +43,7 @@ public class QuizQuestionController : ControllerBase
 
             // Format the question and options for the AI
             var optionsText = string.Join("\n", request.Options.Select((option, index) => $"{index + 1}. {option}"));
-            
-            // Create a prompt for the AI
+              // Create a prompt for the AI
             var prompt = $@"
 As an educational assistant, provide a helpful hint for the following multiple-choice question without revealing the answer directly.
 The hint should guide the student toward understanding which option is correct.
@@ -56,7 +55,7 @@ OPTIONS:
 
 Give a concise, educational hint (max 2 sentences) that helps the student think about the correct answer without giving it away.
 Respond ONLY with the hint text, no explanations or additional formatting.
-Respond in the same language as the question.";
+Always respond in English, regardless of the language of the question.";
 
             // Call the OpenAI API to generate the hint
             var hintResponse = await _openAIHelper.GenerateResponseAsync(prompt);

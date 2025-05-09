@@ -5,6 +5,7 @@ import { HelpCircle, Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../utils/api";
 import FeedbackPopup from "../../components/quiz/FeedbackPopup";
+import Container from "../../components/layout/Container";
 
 interface Question {
 	id: string;
@@ -228,7 +229,7 @@ export default function TakeQuizPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] py-6 sm:py-10">
 			{/* Feedback Popup Component */}
 			<FeedbackPopup
 				isVisible={feedbackPopup.isVisible}
@@ -241,31 +242,31 @@ export default function TakeQuizPage() {
 				}
 			/>
 
-			<div className="mx-auto max-w-4xl">
+			<Container>
 				<motion.div
-					className="mb-8 flex flex-col items-center text-center"
+					className="mb-6 flex flex-col items-center text-center sm:mb-8"
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 				>
 					<div className="relative">
-						<HelpCircle className="mb-4 h-16 w-16 text-[var(--color-primary)]" />
+						<HelpCircle className="mb-3 h-12 w-12 text-[var(--color-primary)] sm:mb-4 sm:h-16 sm:w-16" />
 					</div>
-					<h1 className="bg-[var(--color-primary)] bg-clip-text text-5xl font-extrabold text-transparent">
+					<h1 className="bg-[var(--color-primary)] bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
 						{quiz.title}
 					</h1>
-					<p className="mt-2 text-lg text-gray-600">
+					<p className="mt-2 text-sm text-gray-600 sm:text-base md:text-lg">
 						Answer all questions to complete the quiz! 💪
 					</p>
 				</motion.div>
 
-				<div className="space-y-8">
+				<div className="space-y-5 sm:space-y-8">
 					{quiz.questions.map((q, idx) => (
 						<motion.div
 							key={q.id}
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: idx * 0.1 }}
-							className={`transform rounded-2xl border bg-white p-6 shadow-lg transition-all hover:shadow-xl ${
+							className={`transform rounded-xl border bg-white p-4 shadow-lg transition-all hover:shadow-xl sm:rounded-2xl sm:p-6 ${
 								submitted
 									? answers[idx] === q.correctAnswerIndex
 										? "border-green-500 bg-green-50"
@@ -273,8 +274,8 @@ export default function TakeQuizPage() {
 									: ""
 							}`}
 						>
-							<div className="flex justify-between">
-								<p className="mb-6 text-lg font-semibold">
+							<div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:gap-4">
+								<p className="mb-3 text-base font-semibold sm:mb-6 sm:text-lg">
 									<span className="text-[var(--color-primary)]">
 										{idx + 1}.
 									</span>{" "}
@@ -287,7 +288,7 @@ export default function TakeQuizPage() {
 										disabled={
 											loadingHints[idx] || !!hints[idx]
 										}
-										className="flex h-8 items-center gap-1 rounded-lg bg-amber-100 px-3 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-200 disabled:opacity-50"
+										className="flex h-8 flex-shrink-0 items-center justify-center gap-1 self-end rounded-lg bg-amber-100 px-2 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-200 disabled:opacity-50 sm:justify-start sm:self-start sm:px-3 sm:text-sm"
 										type="button"
 									>
 										{loadingHints[idx] ? (
@@ -295,9 +296,11 @@ export default function TakeQuizPage() {
 										) : (
 											<Lightbulb size={14} />
 										)}
-										{hints[idx]
-											? "Show Hint With AI"
-											: "Get Hint With AI"}
+										<span className="whitespace-nowrap">
+											{hints[idx]
+												? "Show AI Hint"
+												: "Get AI Hint"}
+										</span>
 									</button>
 								)}
 							</div>
@@ -306,16 +309,16 @@ export default function TakeQuizPage() {
 								<motion.div
 									initial={{ opacity: 0, height: 0 }}
 									animate={{ opacity: 1, height: "auto" }}
-									className="mb-4 rounded-lg bg-amber-50 p-3 text-amber-800"
+									className="mb-4 rounded-lg bg-amber-50 p-2 text-sm text-amber-800 sm:p-3"
 								>
 									<div className="flex items-start gap-2">
-										<Lightbulb className="mt-1 h-5 w-5 flex-shrink-0" />
+										<Lightbulb className="mt-1 h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5" />
 										<p>{hints[idx]}</p>
 									</div>
 								</motion.div>
 							)}
 
-							<div className="space-y-4">
+							<div className="space-y-3 sm:space-y-4">
 								{[
 									q.answer1,
 									q.answer2,
@@ -324,7 +327,7 @@ export default function TakeQuizPage() {
 								].map((answer, ansIdx) => (
 									<label
 										key={ansIdx}
-										className={`block transform cursor-pointer rounded-xl border p-4 transition-all hover:-translate-y-1 hover:bg-gray-50 ${
+										className={`block transform cursor-pointer rounded-lg border p-3 transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:rounded-xl sm:p-4 sm:hover:-translate-y-1 ${
 											submitted
 												? ansIdx ===
 													q.correctAnswerIndex
@@ -337,7 +340,7 @@ export default function TakeQuizPage() {
 													: ""
 										}`}
 									>
-										<div className="flex items-center gap-3">
+										<div className="flex items-center gap-2 sm:gap-3">
 											<input
 												type="radio"
 												name={`q-${idx}`}
@@ -350,7 +353,7 @@ export default function TakeQuizPage() {
 												disabled={submitted}
 												className="h-4 w-4 text-[var(--color-primary)]"
 											/>
-											<span className="text-lg">
+											<span className="text-sm sm:text-base md:text-lg">
 												{answer}
 											</span>
 										</div>
@@ -361,7 +364,7 @@ export default function TakeQuizPage() {
 								<motion.div
 									initial={{ opacity: 0, y: 10 }}
 									animate={{ opacity: 1, y: 0 }}
-									className={`mt-6 rounded-xl p-4 ${
+									className={`mt-4 rounded-lg p-3 sm:mt-6 sm:rounded-xl sm:p-4 ${
 										answers[idx] === q.correctAnswerIndex
 											? "bg-green-100 text-green-800"
 											: "bg-red-100 text-red-800"
@@ -375,23 +378,29 @@ export default function TakeQuizPage() {
 								>
 									{answers[idx] === q.correctAnswerIndex ? (
 										<div className="flex items-center gap-2">
-											<span className="text-xl">✨</span>
-											<span>
+											<span className="text-lg sm:text-xl">
+												✨
+											</span>
+											<span className="text-sm sm:text-base">
 												Excellent! Correct answer!
 											</span>
 										</div>
 									) : attemptCount >= 3 ? (
 										<div className="flex items-center gap-2">
-											<span className="text-xl">💡</span>
-											<span>
+											<span className="text-lg sm:text-xl">
+												💡
+											</span>
+											<span className="text-sm sm:text-base">
 												The correct answer was option{" "}
 												{q.correctAnswerIndex + 1}
 											</span>
 										</div>
 									) : (
 										<div className="flex items-center gap-2">
-											<span className="text-xl">❌</span>
-											<span>
+											<span className="text-lg sm:text-xl">
+												❌
+											</span>
+											<span className="text-sm sm:text-base">
 												Incorrect answer. Try again!
 												(Attempt {attemptCount}/3)
 											</span>
@@ -404,7 +413,7 @@ export default function TakeQuizPage() {
 				</div>
 
 				<motion.div
-					className="mt-8 flex justify-center gap-4"
+					className="mt-6 flex flex-col justify-center gap-3 sm:mt-8 sm:flex-row sm:gap-4"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.5 }}
@@ -413,14 +422,16 @@ export default function TakeQuizPage() {
 						<button
 							onClick={handleSubmit}
 							disabled={loading || answers.some((a) => a === -1)}
-							className="transform rounded-xl bg-[var(--color-primary)] px-8 py-3 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl disabled:bg-gray-400"
+							className="transform rounded-xl bg-[var(--color-primary)] px-6 py-2.5 text-base font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl disabled:bg-gray-400 sm:px-8 sm:py-3 sm:text-lg"
 						>
 							{loading ? (
 								"Submitting..."
 							) : (
-								<span className="flex items-center gap-2">
+								<span className="flex items-center justify-center gap-2">
 									Submit Answers
-									<span className="text-xl">🚀</span>
+									<span className="text-lg sm:text-xl">
+										🚀
+									</span>
 								</span>
 							)}
 						</button>
@@ -428,14 +439,14 @@ export default function TakeQuizPage() {
 						<>
 							<button
 								onClick={() => navigate(-1)}
-								className="transform rounded-xl bg-[var(--color-primary)] px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+								className="transform rounded-xl bg-[var(--color-primary)] px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base"
 							>
 								Back to Chapter
 							</button>
 							{!result?.passed && (
 								<button
 									onClick={handleRetry}
-									className="transform rounded-xl bg-[var(--color-accent)] px-6 py-3 font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+									className="transform rounded-xl bg-[var(--color-accent)] px-4 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl sm:px-6 sm:py-3 sm:text-base"
 								>
 									Try Again 💪
 								</button>
@@ -450,13 +461,13 @@ export default function TakeQuizPage() {
 							initial={{ opacity: 0, y: 20 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: 20 }}
-							className="mt-8 overflow-hidden rounded-2xl bg-white p-8 text-center shadow-xl"
+							className="mt-6 overflow-hidden rounded-xl bg-white p-5 text-center shadow-xl sm:mt-8 sm:rounded-2xl sm:p-8"
 						>
-							<h2 className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] bg-clip-text text-3xl font-bold text-transparent">
+							<h2 className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-accent)] bg-clip-text text-2xl font-bold text-transparent sm:text-3xl">
 								Your Result
 							</h2>
-							<div className="mt-4 space-y-2">
-								<p className="text-2xl font-semibold">
+							<div className="mt-3 space-y-1 sm:mt-4 sm:space-y-2">
+								<p className="text-xl font-semibold sm:text-2xl">
 									Score:{" "}
 									<span
 										className={
@@ -468,7 +479,7 @@ export default function TakeQuizPage() {
 										{result.score} / {result.total}
 									</span>
 								</p>
-								<p className="text-xl">
+								<p className="text-lg sm:text-xl">
 									Percentage:{" "}
 									<span
 										className={
@@ -481,7 +492,7 @@ export default function TakeQuizPage() {
 									</span>
 								</p>
 								<p
-									className={`mt-4 text-lg ${
+									className={`mt-3 text-base sm:mt-4 sm:text-lg ${
 										result.passed
 											? "text-green-600"
 											: "text-yellow-600"
@@ -493,7 +504,7 @@ export default function TakeQuizPage() {
 						</motion.div>
 					)}
 				</AnimatePresence>
-			</div>
+			</Container>
 		</div>
 	);
 }

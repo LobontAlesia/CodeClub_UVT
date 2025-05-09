@@ -239,20 +239,20 @@ export default function EditProjectPage() {
 	}
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-6 py-10">
+		<div className="min-h-screen bg-gradient-to-br from-[#e8f5e9] via-white to-[#e3f2fd] px-4 py-8 sm:px-6 sm:py-10">
 			<div className="mx-auto max-w-2xl">
-				<div className="mb-8 text-center">
-					<h1 className="text-4xl font-bold text-[var(--color-primary)]">
+				<div className="mb-6 text-center sm:mb-8">
+					<h1 className="text-3xl font-bold text-[var(--color-primary)] sm:text-4xl">
 						Edit Project
 					</h1>
-					<p className="mt-2 text-gray-600">
+					<p className="mt-2 text-sm text-gray-600 sm:text-base">
 						Update your project details
 					</p>
 				</div>
 
 				<form
 					onSubmit={handleSubmit}
-					className="space-y-6 rounded-xl bg-white p-8 shadow-lg"
+					className="space-y-5 rounded-xl bg-white p-5 shadow-lg sm:space-y-6 sm:p-8"
 				>
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
@@ -284,7 +284,7 @@ export default function EditProjectPage() {
 						<label className="block text-sm font-medium text-gray-700">
 							Update Screenshot of Your Completed Project
 						</label>
-						<p className="mt-1 text-sm text-gray-500">
+						<p className="mt-1 text-xs text-gray-500 sm:text-sm">
 							Please capture a screenshot showing your completed
 							project in action or the final output.
 						</p>
@@ -292,7 +292,7 @@ export default function EditProjectPage() {
 							type="file"
 							accept="image/*"
 							onChange={handleScreenshotUpload}
-							className="mt-1 block w-full"
+							className="mt-1 block w-full text-sm"
 						/>
 						{(screenshotBase64 || originalScreenshotUrl) && (
 							<div className="mt-2">
@@ -303,7 +303,7 @@ export default function EditProjectPage() {
 										""
 									}
 									alt="Screenshot Preview"
-									className="h-32 rounded shadow"
+									className="h-24 rounded shadow sm:h-32"
 								/>
 							</div>
 						)}
@@ -317,10 +317,10 @@ export default function EditProjectPage() {
 							type="file"
 							accept=".py,.cpp,.zip,.sb3"
 							onChange={handleFileUpload}
-							className="mt-1 block w-full"
+							className="mt-1 block w-full text-sm"
 						/>
 						{fileName && (
-							<p className="mt-1 text-sm text-gray-600">
+							<p className="mt-1 break-words text-xs text-gray-600 sm:text-sm">
 								Selected file: {fileName}
 							</p>
 						)}
@@ -339,9 +339,9 @@ export default function EditProjectPage() {
 					</div>
 
 					{isScratchProject && (
-						<div className="rounded-md bg-blue-50 p-4">
-							<div className="flex">
-								<div className="flex-shrink-0">
+						<div className="rounded-md bg-blue-50 p-3 sm:p-4">
+							<div className="flex flex-col sm:flex-row">
+								<div className="mb-2 flex-shrink-0 sm:mb-0">
 									<svg
 										className="h-5 w-5 text-blue-400"
 										xmlns="http://www.w3.org/2000/svg"
@@ -356,13 +356,13 @@ export default function EditProjectPage() {
 										/>
 									</svg>
 								</div>
-								<div className="ml-3 flex-1 md:flex md:justify-between">
-									<p className="text-sm text-blue-700">
+								<div className="flex flex-1 flex-col sm:ml-3 sm:flex-row sm:justify-between">
+									<p className="text-xs text-blue-700 sm:text-sm">
 										To receive a badge, please analyze your
 										Scratch project on Dr. Scratch and
 										upload the received certificate.
 									</p>
-									<p className="mt-3 text-sm md:ml-6 md:mt-0">
+									<p className="mt-2 text-xs sm:ml-4 sm:mt-0 sm:text-sm">
 										<a
 											href="https://www.drscratch.org/"
 											target="_blank"
@@ -390,16 +390,16 @@ export default function EditProjectPage() {
 								type="file"
 								accept=".pdf,.jpg,.jpeg,.png"
 								onChange={handleCertificateUpload}
-								className="mt-1 block w-full"
+								className="mt-1 block w-full text-sm"
 							/>
 							{certificateName && (
-								<p className="mt-1 text-sm text-gray-600">
+								<p className="mt-1 break-words text-xs text-gray-600 sm:text-sm">
 									Selected certificate: {certificateName}
 								</p>
 							)}
 							{originalCertificateUrl && !certificateName && (
 								<div className="mt-2">
-									<p className="text-sm text-gray-600">
+									<p className="text-xs text-gray-600 sm:text-sm">
 										Existing certificate:
 										<a
 											href={originalCertificateUrl}
@@ -415,17 +415,17 @@ export default function EditProjectPage() {
 						</div>
 					)}
 
-					<div className="flex justify-end space-x-4">
+					<div className="flex justify-end space-x-3 sm:space-x-4">
 						<button
 							type="button"
 							onClick={() => navigate("/my-projects")}
-							className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+							className="rounded-md border border-gray-300 bg-white px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 sm:px-4 sm:text-sm"
 						>
 							Cancel
 						</button>
 						<button
 							type="submit"
-							className="rounded-md bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--color-primary-dark)]"
+							className="rounded-md bg-[var(--color-primary)] px-3 py-2 text-xs font-medium text-white hover:bg-[var(--color-primary-dark)] sm:px-4 sm:text-sm"
 						>
 							Save Changes
 						</button>

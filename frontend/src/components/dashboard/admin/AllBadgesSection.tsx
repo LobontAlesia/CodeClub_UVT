@@ -44,11 +44,11 @@ const BadgeGrid = ({
 	};
 
 	return (
-		<div className="grid grid-cols-2 gap-4">
+		<div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
 			{badges.map((badge, index) => (
 				<motion.div
 					key={index}
-					className="group flex w-[180px] cursor-pointer flex-col items-center rounded-xl bg-gradient-to-br from-white to-gray-50 p-3 transition-all hover:-translate-y-1 hover:shadow-lg"
+					className="group flex w-auto cursor-pointer flex-col items-center rounded-xl bg-gradient-to-br from-white to-gray-50 p-3 transition-all hover:-translate-y-1 hover:shadow-lg"
 					onClick={() => onBadgeClick(badge)}
 					whileHover={{ scale: 1.02 }}
 					role="button"
@@ -116,7 +116,7 @@ const AllBadgesSection = ({
 					</p>
 				</div>
 			) : (
-				<div className="grid grid-cols-2 gap-8">
+				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-4">
 						<h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
 							<span className="rounded-full bg-blue-100 p-1">
