@@ -356,26 +356,32 @@ export default function EditProjectPage() {
 										/>
 									</svg>
 								</div>
-								<div className="flex flex-1 flex-col sm:ml-3 sm:flex-row sm:justify-between">
+								<div className="flex flex-1 flex-col sm:ml-3">
 									<p className="text-xs text-blue-700 sm:text-sm">
 										To receive a badge, please analyze your
 										Scratch project on Dr. Scratch and
 										upload the received certificate.
 									</p>
-									<p className="mt-2 text-xs sm:ml-4 sm:mt-0 sm:text-sm">
-										<a
-											href="https://www.drscratch.org/"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
+									<a
+										href="https://www.drscratch.org/"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="mt-3 flex w-full transform items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-blue-700 hover:text-white hover:shadow-xl sm:mt-4 md:w-auto"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											viewBox="0 0 20 20"
+											fill="currentColor"
 										>
-											Go to Dr. Scratch
-											<span aria-hidden="true">
-												{" "}
-												&rarr;
-											</span>
-										</a>
-									</p>
+											<path
+												fillRule="evenodd"
+												d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+												clipRule="evenodd"
+											/>
+										</svg>
+										Analyze Project on Dr. Scratch
+									</a>
 								</div>
 							</div>
 						</div>

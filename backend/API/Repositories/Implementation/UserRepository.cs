@@ -31,10 +31,13 @@ public class UserRepository : BaseRepository<User>, IUserRepository
     public async Task<User?> GetByEmailAsync(string email)
     {
         return await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Email == email);
-    }
-
-    public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
+    }    public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
     {
         return await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.RefreshToken == HttpUtility.UrlDecode(refreshToken));
+    }
+
+    public async Task<User?> GetByIdAsync(Guid userId)
+    {
+        return await _context.Users.Include(u => u.Roles).FirstOrDefaultAsync(u => u.Id == userId);
     }
 }

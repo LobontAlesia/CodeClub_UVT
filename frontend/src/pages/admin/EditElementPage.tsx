@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import FormCard from "../../components/FormCard";
-import { FileEdit } from "lucide-react";
+import { FileEdit, Bold, Italic, Underline } from "lucide-react";
 
 const CHUNK_SIZE = 500000; // 500KB chunks
 
@@ -26,6 +26,11 @@ export default function EditElementPage() {
 	const [content, setContent] = useState("");
 	const [image, setImage] = useState("");
 	const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+	// Text formatting state
+	const [isBold, setIsBold] = useState(false);
+	const [isItalic, setIsItalic] = useState(false);
+	const [isUnderline, setIsUnderline] = useState(false);
 
 	useEffect(() => {
 		fetchElement();
@@ -98,6 +103,67 @@ export default function EditElementPage() {
 				};
 			};
 			reader.readAsDataURL(file);
+		}
+	};
+
+	// Formatting Functions
+	const applyBold = () => {
+		setIsBold(!isBold);
+		const textarea = document.querySelector(
+			"textarea",
+		) as HTMLTextAreaElement;
+		if (!textarea) return;
+
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const selectedText = content.substring(start, end);
+
+		if (start !== end) {
+			const newText =
+				content.substring(0, start) +
+				`**${selectedText}**` +
+				content.substring(end);
+			setContent(newText);
+		}
+	};
+
+	const applyItalic = () => {
+		setIsItalic(!isItalic);
+		const textarea = document.querySelector(
+			"textarea",
+		) as HTMLTextAreaElement;
+		if (!textarea) return;
+
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const selectedText = content.substring(start, end);
+
+		if (start !== end) {
+			const newText =
+				content.substring(0, start) +
+				`*${selectedText}*` +
+				content.substring(end);
+			setContent(newText);
+		}
+	};
+
+	const applyUnderline = () => {
+		setIsUnderline(!isUnderline);
+		const textarea = document.querySelector(
+			"textarea",
+		) as HTMLTextAreaElement;
+		if (!textarea) return;
+
+		const start = textarea.selectionStart;
+		const end = textarea.selectionEnd;
+		const selectedText = content.substring(start, end);
+
+		if (start !== end) {
+			const newText =
+				content.substring(0, start) +
+				`<u>${selectedText}</u>` +
+				content.substring(end);
+			setContent(newText);
 		}
 	};
 
@@ -210,19 +276,49 @@ export default function EditElementPage() {
 				)}
 
 				{(element.type === "Text" ||
-					element.type === "CodeFragment") && (
+					element.type === "CodeFragment" ||
+					element.type === "Header") && (
 					<div>
 						<label className="mb-1 block font-semibold">
 							{element.type === "CodeFragment"
 								? "Code"
 								: "Content"}
 						</label>
+						{element.type === "Text" && (
+							<div className="mb-2 flex flex-wrap gap-2 rounded-lg bg-gray-100 p-2">
+								<button
+									type="button"
+									onClick={applyBold}
+									className={`rounded p-2 ${isBold ? "bg-blue-200" : "hover:bg-gray-200"}`}
+									title="Bold"
+								>
+									<Bold size={16} />
+								</button>
+								<button
+									type="button"
+									onClick={applyItalic}
+									className={`rounded p-2 ${isItalic ? "bg-blue-200" : "hover:bg-gray-200"}`}
+									title="Italic"
+								>
+									<Italic size={16} />
+								</button>
+								<button
+									type="button"
+									onClick={applyUnderline}
+									className={`rounded p-2 ${isUnderline ? "bg-blue-200" : "hover:bg-gray-200"}`}
+									title="Underline"
+								>
+									<Underline size={16} />
+								</button>
+							</div>
+						)}
 						<textarea
 							value={content}
 							onChange={(e) => setContent(e.target.value)}
 							className={`w-full rounded border p-2 ${element.type === "CodeFragment" ? "bg-gray-50 font-mono" : ""}`}
 							rows={6}
 						/>
+
 						{element.type === "CodeFragment" && content && (
 							<div className="mt-4">
 								<label className="mb-1 block font-semibold">

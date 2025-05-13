@@ -30,6 +30,7 @@ import Navbar from "./components/Navbar";
 import AddProjectPage from "./pages/public/AddProjectPage";
 import ProjectDetailsPage from "./pages/public/ProjectDetailsPage";
 import EditProjectPage from "./pages/public/EditProjectPage";
+import ProfilePage from "./pages/public/ProfilePage";
 
 function App() {
 	const location = useLocation();
@@ -193,6 +194,14 @@ function App() {
 					element={
 						<ProtectedRoute>
 							<MyProjectsPage />
+						</ProtectedRoute>
+					}
+				/>
+				<Route
+					path="/profile"
+					element={
+						<ProtectedRoute>
+							<ProfilePage />
 						</ProtectedRoute>
 					}
 				/>

@@ -450,67 +450,61 @@ export default function ChapterDetailsPage() {
 				)}
 
 				{/* Chapter Content */}
-				<DragDropContext onDragEnd={handleDragEnd}>
-					<Droppable droppableId="elements">
-						{(provided) => (
-							<div
-								{...provided.droppableProps}
-								ref={provided.innerRef}
-								className="space-y-6"
-							>
-								{elements.length === 0 ? (
-									<p className="text-center text-gray-500">
-										No elements in this chapter yet.
-									</p>
-								) : (
-									elements.map((element, index) => (
-										<Draggable
-											key={element.id}
-											draggableId={element.id}
-											index={index}
-											isDragDisabled={!isAdmin}
-										>
-											{(provided) => (
-												<div
-													ref={provided.innerRef}
-													{...provided.draggableProps}
-													{...provided.dragHandleProps}
-													className="transform rounded-2xl border bg-white p-6 shadow-md transition-all hover:shadow-xl"
-												>
-													{/* Element header with admin controls */}
-													<motion.div
-														className="mb-4 flex items-center justify-between"
-														initial={
-															!isAdmin
-																? {
-																		opacity: 0,
-																		x: -20,
-																	}
-																: false
-														}
-														animate={{
-															opacity: 1,
-															x: 0,
-														}}
-														transition={{
-															delay: index * 0.1,
-														}}
+				{isAdmin ? (
+					// Admin view - keep original layout with draggable elements
+					<DragDropContext onDragEnd={handleDragEnd}>
+						<Droppable droppableId="elements">
+							{(provided) => (
+								<div
+									{...provided.droppableProps}
+									ref={provided.innerRef}
+									className="space-y-6"
+								>
+									{elements.length === 0 ? (
+										<p className="text-center text-gray-500">
+											No elements in this chapter yet.
+										</p>
+									) : (
+										elements.map((element, index) => (
+											<Draggable
+												key={element.id}
+												draggableId={element.id}
+												index={index}
+												isDragDisabled={!isAdmin}
+											>
+												{(provided) => (
+													<div
+														ref={provided.innerRef}
+														{...provided.draggableProps}
+														{...provided.dragHandleProps}
+														className="transform rounded-2xl border bg-white p-6 shadow-md transition-all hover:shadow-xl"
 													>
-														<div className="flex items-center gap-4">
-															{isAdmin && (
+														{/* Element header with admin controls */}
+														<motion.div
+															className="mb-4 flex items-center justify-between"
+															initial={{
+																opacity: 0,
+																x: -20,
+															}}
+															animate={{
+																opacity: 1,
+																x: 0,
+															}}
+															transition={{
+																delay:
+																	index * 0.1,
+															}}
+														>
+															<div className="flex items-center gap-4">
 																<div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] text-lg font-bold text-white">
 																	{index + 1}
 																</div>
-															)}
-															{isAdmin && (
 																<h2 className="bg-gradient-to-r from-[var(--color-primary)] to-[#4aba7a] bg-clip-text text-2xl font-bold text-transparent">
 																	{
 																		element.title
 																	}
 																</h2>
-															)}
-														</div>
-														{isAdmin && (
+															</div>
 															<div className="flex gap-2">
 																<button
 																	onClick={() =>
@@ -535,86 +529,68 @@ export default function ChapterDetailsPage() {
 																	Delete
 																</button>
 															</div>
-														)}
-													</motion.div>
+														</motion.div>
 
-													{/* Element content */}
-													<motion.div
-														initial={
-															!isAdmin
-																? {
-																		opacity: 0,
-																		y: 20,
-																	}
-																: false
-														}
-														animate={{
-															opacity: 1,
-															y: 0,
-														}}
-														transition={{
-															delay:
-																index * 0.1 +
-																0.2,
-														}}
-													>
-														{element.type ===
-															"Image" &&
-															element.image && (
-																<div className="flex justify-center">
-																	<img
-																		src={
-																			element.image
-																		}
-																		alt={
-																			element.title
-																		}
-																		className="max-h-[600px] w-auto transform rounded-lg object-contain transition-transform hover:scale-105"
-																	/>
-																</div>
-															)}
-														{element.type ===
-															"CodeFragment" &&
-															element.content && (
-																<pre className="relative overflow-x-auto rounded-lg bg-white p-4 font-mono text-sm shadow-lg">
-																	<div className="mb-2 flex gap-2">
-																		<div className="h-3 w-3 rounded-full bg-red-500"></div>
-																		<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-																		<div className="h-3 w-3 rounded-full bg-green-500"></div>
+														{/* Element content */}
+														<motion.div
+															initial={{
+																opacity: 0,
+																y: 20,
+															}}
+															animate={{
+																opacity: 1,
+																y: 0,
+															}}
+															transition={{
+																delay:
+																	index *
+																		0.1 +
+																	0.2,
+															}}
+														>
+															{element.type ===
+																"Image" &&
+																element.image && (
+																	<div className="flex justify-center">
+																		<img
+																			src={
+																				element.image
+																			}
+																			alt={
+																				element.title
+																			}
+																			className="max-h-[600px] w-auto transform rounded-lg object-contain transition-transform hover:scale-105"
+																		/>
 																	</div>
-																	<code>
-																		{
-																			element.content
-																		}
-																	</code>
-																</pre>
-															)}
-														{element.type ===
-															"Form" &&
-															element.formId && (
-																<div className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner">
-																	<div className="mb-4 flex items-center gap-3">
-																		<FiTarget className="h-6 w-6 text-blue-600" />
-																		<h3 className="text-xl font-semibold text-blue-800">
-																			Test
-																			Your
-																			Knowledge!
-																		</h3>
-																	</div>
-																	{!isAdmin && (
-																		<p className="mb-4 text-blue-700">
-																			Time
-																			to
-																			check
-																			your
-																			understanding
-																			with
-																			a
-																			quick
-																			quiz.
-																		</p>
-																	)}
-																	{!isAdmin && (
+																)}
+															{element.type ===
+																"CodeFragment" &&
+																element.content && (
+																	<pre className="relative overflow-x-auto rounded-lg bg-white p-4 font-mono text-sm shadow-lg">
+																		<div className="mb-2 flex gap-2">
+																			<div className="h-3 w-3 rounded-full bg-red-500"></div>
+																			<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+																			<div className="h-3 w-3 rounded-full bg-green-500"></div>
+																		</div>
+																		<code>
+																			{
+																				element.content
+																			}
+																		</code>
+																	</pre>
+																)}
+															{element.type ===
+																"Form" &&
+																element.formId && (
+																	<div className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner">
+																		<div className="mb-4 flex items-center gap-3">
+																			<FiTarget className="h-6 w-6 text-blue-600" />
+																			<h3 className="text-xl font-semibold text-blue-800">
+																				Test
+																				Your
+																				Knowledge!
+																			</h3>
+																		</div>
 																		<button
 																			onClick={() =>
 																				navigate(
@@ -630,35 +606,395 @@ export default function ChapterDetailsPage() {
 																			</span>
 																			<BsRocketTakeoff className="ml-2 h-5 w-5" />
 																		</button>
-																	)}
+																	</div>
+																)}{" "}
+															{element.type ===
+																"Header" &&
+																element.content && (
+																	<div className="prose max-w-none rounded-lg bg-gray-50 p-6 leading-relaxed">
+																		<h3
+																			className="mb-3 mt-4 text-xl font-bold text-[var(--color-primary)]"
+																			dangerouslySetInnerHTML={{
+																				__html: element.content
+																					.trim()
+																					.startsWith(
+																						"#",
+																					)
+																					? element.content
+																							.trim()
+																							.replace(
+																								/^#+\s*/,
+																								"",
+																							)
+																							.replace(
+																								/\*\*(.*?)\*\*/g,
+																								"<strong>$1</strong>",
+																							) // Bold
+																							.replace(
+																								/\*(.*?)\*/g,
+																								"<em>$1</em>",
+																							) // Italic
+																					: element.content
+																							.replace(
+																								/\*\*(.*?)\*\*/g,
+																								"<strong>$1</strong>",
+																							) // Bold
+																							.replace(
+																								/\*(.*?)\*/g,
+																								"<em>$1</em>",
+																							), // Italic
+																			}}
+																		/>
+																	</div>
+																)}
+															{element.type !==
+																"Image" &&
+																element.type !==
+																	"CodeFragment" &&
+																element.type !==
+																	"Form" &&
+																element.type !==
+																	"Header" &&
+																element.content && (
+																	<div className="prose max-w-none rounded-lg bg-gray-50 p-6 leading-relaxed">
+																		<div className="content-element">
+																			{element.content
+																				.split(
+																					/\r?\n/,
+																				)
+																				.map(
+																					(
+																						paragraph,
+																						idx,
+																					) => {
+																						// Check if the paragraph is a header (starts with # in markdown style)
+																						if (
+																							paragraph
+																								.trim()
+																								.startsWith(
+																									"#",
+																								)
+																						) {
+																							const headerText =
+																								paragraph
+																									.trim()
+																									.replace(
+																										/^#+\s*/,
+																										"",
+																									);
+																							return (
+																								<h3
+																									key={
+																										idx
+																									}
+																									className="text-l mb-3 mt-4 font-bold text-[var(--color-primary)]"
+																								>
+																									{
+																										headerText
+																									}
+																								</h3>
+																							);
+																						}
+																						// Regular paragraph with HTML formatting support
+																						return paragraph.trim() ? (
+																							<p
+																								key={
+																									idx
+																								}
+																								className="mb-4 text-lg"
+																								dangerouslySetInnerHTML={{
+																									__html: paragraph
+																										.replace(
+																											/\*\*(.*?)\*\*/g,
+																											"<strong>$1</strong>",
+																										) // Bold
+																										.replace(
+																											/\*(.*?)\*/g,
+																											"<em>$1</em>",
+																										), // Italic
+																									// We keep other HTML tags as-is (underline, spans for color, etc.)
+																								}}
+																							/>
+																						) : null;
+																					},
+																				)}
+																		</div>
+																	</div>
+																)}
+														</motion.div>
+													</div>
+												)}
+											</Draggable>
+										))
+									)}
+									{provided.placeholder}
+								</div>
+							)}
+						</Droppable>
+					</DragDropContext>
+				) : (
+					// User view - book-like layout
+					<div className="mx-auto">
+						{elements.length === 0 ? (
+							<p className="text-center text-gray-500">
+								No content available in this chapter yet.
+							</p>
+						) : (
+							<motion.div
+								className="rounded-2xl border bg-white shadow-lg"
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+							>
+								{/* Book layout for non-admin users */}
+								<div className="book-content p-8">
+									{/* Display all elements in the order they appear in the database */}
+									<div className="prose prose-lg max-w-none leading-relaxed">
+										{elements
+											.filter(
+												(element) =>
+													element.type === "Header" ||
+													element.type ===
+														"CodeFragment" ||
+													(element.type !== "Image" &&
+														element.type !==
+															"Form" &&
+														element.content),
+											)
+											.map((element) => (
+												<div
+													key={element.id}
+													className="mb-6"
+												>
+													{" "}
+													{element.type ===
+														"Header" &&
+														element.content && (
+															<h2
+																className="mb-4 border-b border-gray-200 pb-2 text-xl font-bold text-[var(--color-primary)]"
+																dangerouslySetInnerHTML={{
+																	__html: element.content
+																		.trim()
+																		.startsWith(
+																			"#",
+																		)
+																		? element.content
+																				.trim()
+																				.replace(
+																					/^#+\s*/,
+																					"",
+																				)
+																				.replace(
+																					/\*\*(.*?)\*\*/g,
+																					"<strong>$1</strong>",
+																				) // Bold
+																				.replace(
+																					/\*(.*?)\*/g,
+																					"<em>$1</em>",
+																				) // Italic
+																		: element.content
+																				.replace(
+																					/\*\*(.*?)\*\*/g,
+																					"<strong>$1</strong>",
+																				) // Bold
+																				.replace(
+																					/\*(.*?)\*/g,
+																					"<em>$1</em>",
+																				), // Italic
+																}}
+															/>
+														)}
+													{element.type ===
+														"CodeFragment" &&
+														element.content && (
+															<pre className="relative mb-6 overflow-x-auto rounded-lg bg-gray-50 p-4 font-mono text-sm shadow-lg">
+																<div className="mb-2 flex gap-2">
+																	<div className="h-3 w-3 rounded-full bg-red-500"></div>
+																	<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+																	<div className="h-3 w-3 rounded-full bg-green-500"></div>
 																</div>
-															)}
-														{element.type !==
+																<code>
+																	{
+																		element.content
+																	}
+																</code>
+															</pre>
+														)}
+													{element.type !==
+														"Header" &&
+														element.type !==
 															"Image" &&
-															element.type !==
-																"CodeFragment" &&
-															element.type !==
-																"Form" &&
-															element.content && (
-																<div className="prose max-w-none rounded-lg bg-gray-50 p-6 leading-relaxed">
-																	<p className="text-lg">
-																		{
-																			element.content
-																		}
-																	</p>
-																</div>
-															)}
-													</motion.div>
+														element.type !==
+															"CodeFragment" &&
+														element.type !==
+															"Form" &&
+														element.content && (
+															<div className="content-element">
+																{element.content
+																	.split(
+																		/\r?\n/,
+																	)
+																	.map(
+																		(
+																			paragraph,
+																			idx,
+																		) => {
+																			// Check if the paragraph is a header (starts with # in markdown style)
+																			if (
+																				paragraph
+																					.trim()
+																					.startsWith(
+																						"#",
+																					)
+																			) {
+																				const headerText =
+																					paragraph
+																						.trim()
+																						.replace(
+																							/^#+\s*/,
+																							"",
+																						);
+																				return (
+																					<h3
+																						key={
+																							idx
+																						}
+																						className="text-l mb-3 mt-6 font-bold text-[var(--color-primary)]"
+																					>
+																						{
+																							headerText
+																						}
+																					</h3>
+																				);
+																			}
+																			// Regular paragraph with HTML formatting support
+																			return paragraph.trim() ? (
+																				<p
+																					key={
+																						idx
+																					}
+																					className="mb-4 text-lg"
+																					dangerouslySetInnerHTML={{
+																						__html: paragraph
+																							.replace(
+																								/\*\*(.*?)\*\*/g,
+																								"<strong>$1</strong>",
+																							) // Bold
+																							.replace(
+																								/\*(.*?)\*/g,
+																								"<em>$1</em>",
+																							), // Italic
+																						// We keep other HTML tags as-is (underline, spans for color, etc.)
+																					}}
+																				/>
+																			) : null;
+																		},
+																	)}
+															</div>
+														)}
 												</div>
-											)}
-										</Draggable>
-									))
-								)}
-								{provided.placeholder}
-							</div>
+											))}
+									</div>
+
+									{/* Display images in a gallery section if there are any */}
+									{elements.some(
+										(element) =>
+											element.type === "Image" &&
+											element.image,
+									) && (
+										<div className="mt-10 border-t border-gray-200 pt-8">
+											<h3 className="mb-6 text-xl font-bold text-[var(--color-primary)]">
+												Images
+											</h3>
+											<div className="grid grid-cols-1 gap-8">
+												{elements
+													.filter(
+														(element) =>
+															element.type ===
+																"Image" &&
+															element.image,
+													)
+													.map((element) => (
+														<div
+															key={element.id}
+															className="flex justify-center"
+														>
+															<img
+																src={
+																	element.image
+																}
+																alt={
+																	element.title ||
+																	"Chapter image"
+																}
+																className="max-h-[600px] w-auto rounded-lg object-contain transition-transform hover:scale-105"
+															/>
+														</div>
+													))}
+											</div>
+										</div>
+									)}
+
+									{/* Display quiz forms in a separate section if there are any */}
+									{elements.some(
+										(element) =>
+											element.type === "Form" &&
+											element.formId,
+									) && (
+										<div className="mt-10 border-t border-gray-200 pt-8">
+											<h3 className="mb-6 text-xl font-bold text-[var(--color-primary)]">
+												Knowledge Check
+											</h3>
+											<div className="space-y-6">
+												{elements
+													.filter(
+														(element) =>
+															element.type ===
+																"Form" &&
+															element.formId,
+													)
+													.map((element) => (
+														<div
+															key={element.id}
+															className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner"
+														>
+															<div className="mb-4 flex items-center gap-3">
+																<FiTarget className="h-6 w-6 text-blue-600" />
+																<h3 className="text-xl font-semibold text-blue-800">
+																	Test Your
+																	Knowledge!
+																</h3>
+															</div>
+															<p className="mb-4 text-blue-700">
+																Time to check
+																your
+																understanding
+																with a quick
+																quiz.
+															</p>
+															<button
+																onClick={() =>
+																	navigate(
+																		`/quiz/${element.formId}`,
+																	)
+																}
+																className="flex transform items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-blue-700 hover:shadow-xl"
+																type="button"
+															>
+																<span>
+																	Start Quiz
+																</span>
+																<BsRocketTakeoff className="ml-2 h-5 w-5" />
+															</button>
+														</div>
+													))}
+											</div>
+										</div>
+									)}
+								</div>
+							</motion.div>
 						)}
-					</Droppable>
-				</DragDropContext>
+					</div>
+				)}
 
 				{/* Chapter completion section for students */}
 				{!isAdmin && elements.length > 0 && (

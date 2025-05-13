@@ -15,15 +15,20 @@ public static class JwtUtil
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
         SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(EnvironmentVariables.JwtSecret));
-        SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-        List<Claim> claims =
+        SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);        List<Claim> claims =
         [
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Email, user.Email)
         ];
+        
+        // Add avatar claim if it exists
+        if (!string.IsNullOrEmpty(user.Avatar))
+        {
+            claims.Add(new Claim("avatar", user.Avatar));
+        }
+        
         claims.AddRange(user.Roles.Select(role => new Claim(CustomClaimTypes.Roles, role.Name)));
 
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor

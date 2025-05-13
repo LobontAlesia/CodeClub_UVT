@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { HelpCircle, Lightbulb } from "lucide-react";
+import { Lightbulb } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../utils/api";
 import FeedbackPopup from "../../components/quiz/FeedbackPopup";
@@ -248,9 +248,9 @@ export default function TakeQuizPage() {
 					initial={{ opacity: 0, y: -20 }}
 					animate={{ opacity: 1, y: 0 }}
 				>
-					<div className="relative">
+					{/* <div className="relative">
 						<HelpCircle className="mb-3 h-12 w-12 text-[var(--color-primary)] sm:mb-4 sm:h-16 sm:w-16" />
-					</div>
+					</div> */}
 					<h1 className="bg-[var(--color-primary)] bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl md:text-5xl">
 						{quiz.title}
 					</h1>
@@ -270,7 +270,11 @@ export default function TakeQuizPage() {
 								submitted
 									? answers[idx] === q.correctAnswerIndex
 										? "border-green-500 bg-green-50"
-										: "border-red-500 bg-red-50"
+										: attemptCount >= 3 &&
+											  answers[idx] !==
+													q.correctAnswerIndex
+											? "border-yellow-500 bg-yellow-50" // Galben când s-au epuizat încercările și răspunsul e greșit
+											: "border-red-500 bg-red-50"
 									: ""
 							}`}
 						>
@@ -330,8 +334,11 @@ export default function TakeQuizPage() {
 										className={`block transform cursor-pointer rounded-lg border p-3 transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:rounded-xl sm:p-4 sm:hover:-translate-y-1 ${
 											submitted
 												? ansIdx ===
-													q.correctAnswerIndex
-													? "border-green-500 bg-green-100"
+														q.correctAnswerIndex &&
+													(attemptCount >= 3 ||
+														answers[idx] ===
+															q.correctAnswerIndex)
+													? "border-green-500 bg-green-100" // Colorează verde doar după 3 încercări sau când răspunsul este corect
 													: answers[idx] === ansIdx
 														? "border-red-500 bg-red-100"
 														: ""
@@ -367,7 +374,9 @@ export default function TakeQuizPage() {
 									className={`mt-4 rounded-lg p-3 sm:mt-6 sm:rounded-xl sm:p-4 ${
 										answers[idx] === q.correctAnswerIndex
 											? "bg-green-100 text-green-800"
-											: "bg-red-100 text-red-800"
+											: attemptCount >= 3
+												? "bg-yellow-100 text-yellow-800" // Galben când s-au epuizat încercările
+												: "bg-red-100 text-red-800"
 									}`}
 									onClick={() =>
 										handleAnswerFeedback(

@@ -420,11 +420,22 @@ function ProjectReviewCard({
 											href="https://www.drscratch.org/"
 											target="_blank"
 											rel="noopener noreferrer"
-											className="underline"
+											className="inline-flex transform items-center gap-1 rounded-lg bg-blue-600 px-2 py-1 font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-blue-700 hover:text-white hover:shadow-md"
 										>
 											Dr. Scratch
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												className="h-3 w-3"
+												viewBox="0 0 20 20"
+												fill="currentColor"
+											>
+												<path
+													fillRule="evenodd"
+													d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+													clipRule="evenodd"
+												/>
+											</svg>
 										</a>
-										.
 									</p>
 								)}
 								{portfolio.status === "Pending" &&
@@ -443,14 +454,14 @@ function ProjectReviewCard({
 			<div className="space-y-4 rounded-lg bg-gray-50 p-4">
 				<div>
 					<label className="block text-sm font-medium text-gray-700">
-						Feedback
+						Mentor Feedback
 					</label>
 					<textarea
 						value={feedback}
 						onChange={(e) => setFeedback(e.target.value)}
 						rows={3}
 						className="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
-						placeholder="Provide feedback to the student..."
+						placeholder="Provide feedback to the student (will be visible for both approved and rejected projects)..."
 					/>
 				</div>
 

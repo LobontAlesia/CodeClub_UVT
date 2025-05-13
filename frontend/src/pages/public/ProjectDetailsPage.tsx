@@ -256,10 +256,21 @@ export default function ProjectDetailsPage() {
 									<span className="text-3xl sm:text-4xl">
 										💪
 									</span>
-									<p className="mt-2 text-sm font-medium text-red-700 sm:text-base">
-										{portfolio.feedback ||
-											"Don't give up! Read the feedback and try again."}
-									</p>
+									{portfolio.feedback ? (
+										<div className="mt-3 flex flex-col items-center">
+											<p className="text-xs font-medium text-red-900 sm:text-sm">
+												Mentor Feedback:
+											</p>
+											<p className="mt-1 text-sm font-medium text-red-700 sm:text-base">
+												"{portfolio.feedback}"
+											</p>
+										</div>
+									) : (
+										<p className="mt-2 text-sm font-medium text-red-700 sm:text-base">
+											Don't give up! Read the feedback and
+											try again.
+										</p>
+									)}
 								</div>
 							) : (
 								<div className="flex flex-col items-center text-center">
@@ -270,6 +281,17 @@ export default function ProjectDetailsPage() {
 										Congratulations! Your project has been
 										approved!
 									</p>
+
+									{portfolio.feedback && (
+										<div className="mt-3 flex flex-col items-center">
+											<p className="text-xs font-medium text-green-900 sm:text-sm">
+												Mentor Feedback:
+											</p>
+											<p className="mt-1 text-sm font-medium text-green-700 sm:text-base">
+												"{portfolio.feedback}"
+											</p>
+										</div>
+									)}
 
 									{/* Badge display */}
 									{portfolio.externalBadge && (
@@ -418,21 +440,22 @@ export default function ProjectDetailsPage() {
 													href="https://www.drscratch.org/"
 													target="_blank"
 													rel="noopener noreferrer"
-													className="mt-2 inline-flex items-center text-xs font-medium text-blue-600 hover:underline sm:text-sm"
+													className="mt-3 inline-flex transform items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-blue-700 hover:text-white hover:shadow-xl sm:mt-4"
 												>
-													Visit Dr. Scratch for
-													analysis
 													<svg
-														className="ml-1 h-3 w-3 sm:h-4 sm:w-4"
-														fill="currentColor"
+														xmlns="http://www.w3.org/2000/svg"
+														className="h-5 w-5"
 														viewBox="0 0 20 20"
+														fill="currentColor"
 													>
 														<path
 															fillRule="evenodd"
 															d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
 															clipRule="evenodd"
-														></path>
+														/>
 													</svg>
+													Analyze Project on Dr.
+													Scratch
 												</a>
 											</div>
 										)}

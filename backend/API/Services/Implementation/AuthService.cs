@@ -68,9 +68,7 @@ public class AuthService(IUserRepository userRepository) : IAuthService
             Console.WriteLine($"Stack trace: {ex.StackTrace}");
             throw; // Re-throw to maintain the 500 status code
         }
-    }
-
-    public async Task<AuthResponseModel?> RefreshTokenAsync(string refreshToken)
+    }    public async Task<AuthResponseModel?> RefreshTokenAsync(string refreshToken)
     {
         User? user = await userRepository.GetByRefreshTokenAsync(refreshToken);
         if (user == null)
@@ -92,5 +90,13 @@ public class AuthService(IUserRepository userRepository) : IAuthService
             Token = JwtUtil.GenerateToken(user),
             RefreshToken = user.RefreshToken
         };
+    }    public Task<bool> VerifyPasswordAsync(User user, string password)
+    {
+        return Task.FromResult(BCrypt.Net.BCrypt.EnhancedVerify(password, user.PasswordHash));
+    }
+
+    public string HashPassword(string password)
+    {
+        return BCrypt.Net.BCrypt.EnhancedHashPassword(password);
     }
 }

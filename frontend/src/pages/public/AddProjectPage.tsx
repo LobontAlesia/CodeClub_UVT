@@ -151,13 +151,6 @@ export default function AddProjectPage() {
 			return;
 		}
 
-		if (!fileBase64 && !externalLink) {
-			toast.error(
-				"Please either upload a project file or provide an external link",
-			);
-			return;
-		}
-
 		// If it's a Scratch project but no certificate was uploaded
 		if (isScratchProject && !certificateBase64) {
 			toast.error(
@@ -210,26 +203,62 @@ export default function AddProjectPage() {
 						<label className="block text-sm font-medium text-gray-700">
 							Project Title
 						</label>
-						<input
-							type="text"
-							value={title}
-							onChange={(e) => setTitle(e.target.value)}
-							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
-							required
-						/>
+						<div className="relative">
+							<input
+								type="text"
+								value={title}
+								onChange={(e) => setTitle(e.target.value)}
+								maxLength={128}
+								className={`mt-1 block w-full rounded-md border ${
+									title.length >= 128
+										? "border-red-500"
+										: "border-gray-300"
+								} px-3 py-2 text-sm sm:text-base`}
+								required
+							/>
+							<div
+								className={`mt-1 text-right text-xs ${
+									title.length >= 100
+										? title.length >= 128
+											? "text-red-500"
+											: "text-orange-500"
+										: "text-gray-500"
+								}`}
+							>
+								{title.length}/128 characters
+							</div>
+						</div>
 					</div>
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
 							Description
 						</label>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							rows={4}
-							className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm sm:text-base"
-							required
-						/>
+						<div className="relative">
+							<textarea
+								value={description}
+								onChange={(e) => setDescription(e.target.value)}
+								rows={4}
+								maxLength={256}
+								className={`mt-1 block w-full rounded-md border ${
+									description.length >= 256
+										? "border-red-500"
+										: "border-gray-300"
+								} px-3 py-2 text-sm sm:text-base`}
+								required
+							/>
+							<div
+								className={`mt-1 text-right text-xs ${
+									description.length >= 230
+										? description.length >= 256
+											? "text-red-500"
+											: "text-orange-500"
+										: "text-gray-500"
+								}`}
+							>
+								{description.length}/256 characters
+							</div>
+						</div>
 					</div>
 
 					<div>
@@ -260,7 +289,7 @@ export default function AddProjectPage() {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
-							Upload Project File (optional)
+							Upload Project File
 						</label>
 						<input
 							type="file"
@@ -293,26 +322,32 @@ export default function AddProjectPage() {
 										/>
 									</svg>
 								</div>
-								<div className="flex-1 sm:ml-3 md:flex md:flex-col md:justify-between lg:flex-row">
+								<div className="flex-1 sm:ml-3 md:flex md:flex-col">
 									<p className="text-xs text-blue-700 sm:text-sm">
 										To receive a badge, please analyze your
 										Scratch project on Dr. Scratch and
 										upload the received certificate.
 									</p>
-									<p className="mt-2 text-xs sm:mt-3 sm:text-sm md:lg:mt-0 md:lg:ml-6">
-										<a
-											href="https://www.drscratch.org/"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="whitespace-nowrap font-medium text-blue-700 hover:text-blue-600"
+									<a
+										href="https://www.drscratch.org/"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="mt-3 flex w-full transform items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white shadow-lg transition-all hover:-translate-y-1 hover:bg-blue-700 hover:text-white hover:shadow-xl sm:mt-4 md:w-auto"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											viewBox="0 0 20 20"
+											fill="currentColor"
 										>
-											Go to Dr. Scratch
-											<span aria-hidden="true">
-												{" "}
-												&rarr;
-											</span>
-										</a>
-									</p>
+											<path
+												fillRule="evenodd"
+												d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+												clipRule="evenodd"
+											/>
+										</svg>
+										Analyze Project on Dr. Scratch
+									</a>
 								</div>
 							</div>
 						</div>
@@ -340,8 +375,12 @@ export default function AddProjectPage() {
 
 					<div>
 						<label className="block text-sm font-medium text-gray-700">
-							Project External Link (optional)
+							Project External Link
 						</label>
+						<p className="mt-1 text-xs text-gray-500 sm:text-sm">
+							Provide a link to your project on CodeClub platform
+							so your teacher can see your project.
+						</p>
 						<input
 							type="url"
 							value={externalLink}
