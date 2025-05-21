@@ -16,6 +16,7 @@ import CourseManagementSection from "../../components/dashboard/admin/CourseMana
 import AdminToolsSection from "../../components/dashboard/admin/AdminToolsSection";
 import BadgeDetailsModal from "../../components/dashboard/BadgeDetailsModal";
 import DeleteBadgeModal from "../../components/dashboard/admin/DeleteBadgeModal";
+import EditBadgeImageModal from "../../components/dashboard/admin/EditBadgeImageModal";
 import HeroSection from "../../components/dashboard/HeroSection";
 
 interface Badge {
@@ -70,6 +71,9 @@ const DashboardPage = () => {
 	>(null);
 	const [loading, setLoading] = useState(true);
 	const [badgeToDelete, setBadgeToDelete] = useState<
+		Badge | ExternalBadge | null
+	>(null);
+	const [badgeToEdit, setBadgeToEdit] = useState<
 		Badge | ExternalBadge | null
 	>(null);
 	const navigate = useNavigate();
@@ -164,6 +168,32 @@ const DashboardPage = () => {
 
 	const handleDeleteBadge = async (badge: Badge | ExternalBadge) => {
 		setBadgeToDelete(badge);
+	};
+
+	const handleEditBadgeImage = (badge: Badge | ExternalBadge) => {
+		setSelectedBadge(null); // Close the details modal
+		setBadgeToEdit(badge); // Open the edit modal
+	};
+
+	const handleBadgeUpdated = (updatedBadge: Badge | ExternalBadge) => {
+		// Update the badge in the appropriate array
+		if ("category" in updatedBadge) {
+			// External badge
+			setAllExternalBadges(
+				allExternalBadges.map((b) =>
+					b.id === updatedBadge.id
+						? (updatedBadge as ExternalBadge)
+						: b,
+				),
+			);
+		} else {
+			// Regular badge
+			setAllBadges(
+				allBadges.map((b) =>
+					b.id === updatedBadge.id ? (updatedBadge as Badge) : b,
+				),
+			);
+		}
 	};
 
 	const confirmDelete = async () => {
@@ -263,6 +293,8 @@ const DashboardPage = () => {
 					<BadgeDetailsModal
 						badge={selectedBadge}
 						onClose={() => setSelectedBadge(null)}
+						isAdmin={role === "Admin"}
+						onEditImage={handleEditBadgeImage}
 					/>
 				)}
 
@@ -271,6 +303,14 @@ const DashboardPage = () => {
 						badge={badgeToDelete}
 						onConfirm={confirmDelete}
 						onCancel={() => setBadgeToDelete(null)}
+					/>
+				)}
+
+				{badgeToEdit && (
+					<EditBadgeImageModal
+						badge={badgeToEdit}
+						onClose={() => setBadgeToEdit(null)}
+						onBadgeUpdated={handleBadgeUpdated}
 					/>
 				)}
 			</AnimatePresence>

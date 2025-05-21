@@ -56,4 +56,16 @@ public class ExternalBadgeService : IExternalBadgeService
 
         await _repository.Delete(id);
     }
+
+    public async Task UpdateBadgeIcon(Guid id, string icon)
+    {
+        var badge = await _context.ExternalBadges.FindAsync(id);
+        if (badge == null)
+        {
+            throw new InvalidOperationException("External badge not found");
+        }
+
+        badge.Icon = icon;
+        await _context.SaveChangesAsync();
+    }
 }

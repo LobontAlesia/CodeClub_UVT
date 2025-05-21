@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using API.Services;
 using API.Models;
 using API.Mappers;
-using API;  
+using API;
 
 [ApiController]
 [Route("[controller]")]
@@ -84,6 +84,24 @@ public class ExternalBadgeController : ControllerBase
         catch (Exception)
         {
             return StatusCode(500, "An error occurred while deleting the badge");
+        }
+    }    // Admin: Update badge image
+    [HttpPut("{id}/icon")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateExternalBadgeIcon([FromRoute] Guid id, [FromBody] BadgeIconUpdateModel model)
+    {
+        try
+        {
+            await _externalBadgeService.UpdateBadgeIcon(id, model.Icon);
+            return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Failed to update badge icon: {ex.Message}");
         }
     }
 }

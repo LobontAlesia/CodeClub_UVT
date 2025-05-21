@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../utils/api";
 import FormCard from "../../components/FormCard";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, Plus } from "lucide-react";
 
 interface Question {
 	questionText: string;
@@ -157,7 +157,7 @@ const AddQuizPage = () => {
 					onClick={handleAddQuestion}
 					className="w-full rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
 				>
-					➕ Add Question
+					<Plus size={16} className="mr-1 inline" /> Add Question
 				</button>
 
 				<div>

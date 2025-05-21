@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plus, GraduationCap, Edit, Trash2 } from "lucide-react";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import { FiClock, FiBook, FiBookOpen } from "react-icons/fi";
 import { BsRocketTakeoff } from "react-icons/bs";
 import api from "../../utils/api";
@@ -43,6 +44,8 @@ export default function LessonDetailsPage() {
 		totalChapters: 0,
 		progressPercentage: 0,
 	});
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [chapterToDelete, setChapterToDelete] = useState<string | null>(null);
 
 	const fetchLessonData = async () => {
 		if (!lessonId) return;
@@ -148,14 +151,21 @@ export default function LessonDetailsPage() {
 		}
 	}, [navigate]);
 
-	const handleDeleteChapter = async (chapterId: string) => {
-		if (!window.confirm("Are you sure you want to delete this chapter?"))
-			return;
+	const handleDeleteClick = (chapterId: string) => {
+		if (!isAdmin) return;
+		setChapterToDelete(chapterId);
+		setShowDeleteModal(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!chapterToDelete || !isAdmin) return;
 
 		try {
-			await api.delete(`/Chapter/${chapterId}`);
+			await api.delete(`/Chapter/${chapterToDelete}`);
 			toast.success("Chapter deleted!");
-			setChapters(chapters.filter((c) => c.id !== chapterId));
+			setChapters(chapters.filter((c) => c.id !== chapterToDelete));
+			setShowDeleteModal(false);
+			setChapterToDelete(null);
 		} catch (error) {
 			console.error("Error deleting chapter", error);
 			toast.error("Failed to delete chapter");
@@ -401,7 +411,7 @@ export default function LessonDetailsPage() {
 																					e,
 																				) => {
 																					e.stopPropagation();
-																					handleDeleteChapter(
+																					handleDeleteClick(
 																						chapter.id,
 																					);
 																				}}
@@ -434,6 +444,20 @@ export default function LessonDetailsPage() {
 					</DragDropContext>
 				</div>
 			</Container>
+
+			{/* Confirmation Modal for Delete */}
+			<ConfirmationModal
+				isOpen={showDeleteModal}
+				title="Delete Chapter"
+				message="Are you sure you want to delete this chapter? This action cannot be undone."
+				onConfirm={handleConfirmDelete}
+				onCancel={() => {
+					setShowDeleteModal(false);
+					setChapterToDelete(null);
+				}}
+				confirmText="Delete"
+				cancelText="Cancel"
+			/>
 		</div>
 	);
 }

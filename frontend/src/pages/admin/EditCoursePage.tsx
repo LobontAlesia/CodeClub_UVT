@@ -226,7 +226,8 @@ const EditCoursePage = () => {
 						onClick={handleUpdate}
 						className="flex-1 rounded bg-yellow-500 py-2 font-semibold text-white hover:bg-yellow-600"
 					>
-						✏️ Save Changes
+						<Pencil size={16} className="mr-1 inline" /> Save
+						Changes
 					</button>
 				</div>
 			</div>

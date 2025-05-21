@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import FormCard from "../../components/FormCard";
-import { Layers } from "lucide-react";
+import { Layers, Plus } from "lucide-react";
 
 const CreateLessonPage = () => {
 	const [title, setTitle] = useState("");
@@ -88,7 +88,7 @@ const CreateLessonPage = () => {
 						type="submit"
 						className="flex flex-1 transform items-center justify-center gap-2 rounded-xl bg-[var(--color-primary)] px-4 py-2 text-white shadow transition-all hover:-translate-y-1 hover:shadow-lg"
 					>
-						➕ Add Lesson
+						<Plus size={16} /> Add Lesson
 					</button>
 				</div>
 			</form>

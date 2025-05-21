@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Edit } from "lucide-react";
 
 interface Badge {
 	id: string;
@@ -19,9 +19,16 @@ interface ExternalBadge {
 interface BadgeDetailsModalProps {
 	badge: Badge | ExternalBadge;
 	onClose: () => void;
+	isAdmin?: boolean;
+	onEditImage?: (badge: Badge | ExternalBadge) => void;
 }
 
-const BadgeDetailsModal = ({ badge, onClose }: BadgeDetailsModalProps) => {
+const BadgeDetailsModal = ({
+	badge,
+	onClose,
+	isAdmin = false,
+	onEditImage,
+}: BadgeDetailsModalProps) => {
 	const displayBadgeIcon = (badge: Badge | ExternalBadge) => {
 		if (!badge.icon) return "";
 		if (badge.icon.includes("data:image")) {
@@ -51,11 +58,25 @@ const BadgeDetailsModal = ({ badge, onClose }: BadgeDetailsModalProps) => {
 				>
 					<X size={16} className="text-white" />
 				</button>
-				<img
-					src={displayBadgeIcon(badge)}
-					alt={badge.name}
-					className="h-48 w-48 rounded-lg"
-				/>
+				<div className="relative">
+					<img
+						src={displayBadgeIcon(badge)}
+						alt={badge.name}
+						className="h-48 w-48 rounded-lg"
+					/>
+					{isAdmin && onEditImage && (
+						<button
+							onClick={(e) => {
+								e.stopPropagation();
+								onEditImage(badge);
+							}}
+							className="absolute bottom-2 right-2 rounded-full bg-blue-500 p-2 shadow-md transition-colors hover:bg-blue-600"
+							title="Edit badge image"
+						>
+							<Edit size={16} className="text-white" />
+						</button>
+					)}
+				</div>
 				<h3 className="mt-4 text-center text-xl font-bold">
 					{badge.name}
 				</h3>

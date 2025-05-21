@@ -8,7 +8,6 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import {
 	FiClock,
 	FiFileText,
-	FiEdit,
 	FiTrash2,
 	FiSend,
 	FiPlus,
@@ -17,6 +16,8 @@ import {
 	FiCheckCircle,
 	FiX,
 } from "react-icons/fi";
+import { Pencil } from "lucide-react";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import { BsRocketTakeoff, BsStar, BsTrophy, BsTree } from "react-icons/bs";
 import Container from "../../components/layout/Container";
 import ResponsiveCard from "../../components/layout/ResponsiveCard";
@@ -55,6 +56,7 @@ const CourseDetailsPage = () => {
 	const [lessons, setLessons] = useState<Lesson[]>([]);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [loading, setLoading] = useState(true);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [progress, setProgress] = useState({
 		totalLessons: 0,
 		completedLessons: 0,
@@ -132,10 +134,13 @@ const CourseDetailsPage = () => {
 		}
 	};
 
-	const handleDelete = async () => {
-		if (!course) return;
-		if (!window.confirm("Are you sure you want to delete this course?"))
-			return;
+	const handleDeleteClick = () => {
+		if (!course || !isAdmin) return;
+		setShowDeleteModal(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!course || !isAdmin) return;
 
 		try {
 			const token = localStorage.getItem("token");
@@ -146,6 +151,7 @@ const CourseDetailsPage = () => {
 				},
 			);
 			toast.success("Course deleted");
+			setShowDeleteModal(false);
 			navigate("/courses");
 		} catch (error) {
 			console.error(error);
@@ -225,7 +231,7 @@ const CourseDetailsPage = () => {
 							}
 							className="rounded-lg bg-yellow-500 px-2 py-1 text-xs font-bold text-white transition-colors hover:bg-yellow-600 sm:text-sm"
 						>
-							<FiEdit className="mr-1 inline" /> Edit
+							<Pencil size={14} className="mr-1 inline" /> Edit
 						</button>
 					</div>
 				)}
@@ -392,10 +398,11 @@ const CourseDetailsPage = () => {
 							className="transform rounded-lg bg-yellow-500 px-3 py-1.5 text-sm font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-yellow-600 hover:shadow-lg sm:px-4 sm:py-2 sm:text-base"
 							type="button"
 						>
-							<FiEdit className="mr-1 inline" /> Edit Course
+							<Pencil size={16} className="mr-1 inline" /> Edit
+							Course
 						</button>
 						<button
-							onClick={handleDelete}
+							onClick={handleDeleteClick}
 							className="transform rounded-lg bg-red-500 px-3 py-1.5 text-sm font-bold text-white shadow transition-all hover:-translate-y-1 hover:bg-red-600 hover:shadow-lg sm:px-4 sm:py-2 sm:text-base"
 							type="button"
 						>
@@ -479,6 +486,17 @@ const CourseDetailsPage = () => {
 					</div>
 				)}
 			</Container>
+
+			{/* Confirmation Modal for Delete */}
+			<ConfirmationModal
+				isOpen={showDeleteModal}
+				title="Delete Course"
+				message="Are you sure you want to delete this course? This action cannot be undone."
+				onConfirm={handleConfirmDelete}
+				onCancel={() => setShowDeleteModal(false)}
+				confirmText="Delete"
+				cancelText="Cancel"
+			/>
 		</div>
 	);
 };

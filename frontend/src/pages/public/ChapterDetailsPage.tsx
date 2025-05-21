@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Plus, ArrowLeft, CheckCircle, Wand2 } from "lucide-react";
 import { FiTarget } from "react-icons/fi";
 import { BsRocketTakeoff, BsBook } from "react-icons/bs";
+import ConfirmationModal from "../../components/ConfirmationModal";
 
 interface ChapterElement {
 	id: string;
@@ -43,6 +44,8 @@ export default function ChapterDetailsPage() {
 		GeneratedQuizQuestion[]
 	>([]);
 	const [showQuizPreview, setShowQuizPreview] = useState(false);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [elementToDelete, setElementToDelete] = useState<string | null>(null);
 
 	useEffect(() => {
 		const token = localStorage.getItem("token");
@@ -146,16 +149,20 @@ export default function ChapterDetailsPage() {
 		}
 	};
 
-	const handleDelete = async (elementId: string) => {
+	const handleDeleteClick = (elementId: string) => {
 		if (!isAdmin) return;
-		const confirmDelete = window.confirm(
-			"Are you sure you want to delete this element?",
-		);
-		if (!confirmDelete) return;
+		setElementToDelete(elementId);
+		setShowDeleteModal(true);
+	};
+
+	const handleConfirmDelete = async () => {
+		if (!elementToDelete || !isAdmin) return;
 
 		try {
-			await api.delete(`/chapterelement/${elementId}`);
+			await api.delete(`/chapterelement/${elementToDelete}`);
 			toast.success("Element deleted successfully!");
+			setShowDeleteModal(false);
+			setElementToDelete(null);
 			fetchElements();
 		} catch (error) {
 			console.error(error);
@@ -519,7 +526,7 @@ export default function ChapterDetailsPage() {
 																</button>
 																<button
 																	onClick={() =>
-																		handleDelete(
+																		handleDeleteClick(
 																			element.id,
 																		)
 																	}
@@ -1026,6 +1033,20 @@ export default function ChapterDetailsPage() {
 					</motion.div>
 				)}
 			</div>
+
+			{/* Confirmation Modal for Delete */}
+			<ConfirmationModal
+				isOpen={showDeleteModal}
+				title="Delete Element"
+				message="Are you sure you want to delete this element? This action cannot be undone."
+				onConfirm={handleConfirmDelete}
+				onCancel={() => {
+					setShowDeleteModal(false);
+					setElementToDelete(null);
+				}}
+				confirmText="Delete"
+				cancelText="Cancel"
+			/>
 		</div>
 	);
 }

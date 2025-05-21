@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import FormCard from "../../components/FormCard";
-import { FilePlus2, Bold, Italic, Underline } from "lucide-react";
+import { FilePlus2, Bold, Italic, Underline, Plus } from "lucide-react";
 
 const CHUNK_SIZE = 500000; // 500KB chunks
 
@@ -341,7 +341,7 @@ const AddElementPage = () => {
 						type="submit"
 						className="flex-1 rounded bg-blue-500 py-2 font-semibold text-white hover:bg-blue-600"
 					>
-						➕ Add Element
+						<Plus size={16} className="mr-1 inline" /> Add Element
 					</button>
 				</div>
 			</form>

@@ -74,6 +74,21 @@ public class BadgeController : ControllerBase
         return Ok(badges);
     }
 
+    [HttpPut("{id}/icon")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> UpdateBadgeIcon([FromRoute] Guid id, [FromBody] BadgeIconUpdateModel model)
+    {
+        var badge = await _badgeRepository.GetByIdAsync(id);
+        if (badge == null)
+            return NotFound("Badge not found");
+
+        // Update only the icon
+        badge.Icon = model.Icon;
+
+        await _badgeRepository.UpdateAsync(badge);
+        return Ok();
+    }
+
     [HttpDelete("{id}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteBadge([FromRoute] Guid id)
