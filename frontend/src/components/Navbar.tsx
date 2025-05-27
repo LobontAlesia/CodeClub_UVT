@@ -96,7 +96,7 @@ const Navbar = () => {
 			<div className="flex md:hidden">
 				<button
 					onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-					className="text-gray-700 focus:outline-none"
+					className="text-white focus:outline-none"
 					aria-label="Toggle menu"
 				>
 					{isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

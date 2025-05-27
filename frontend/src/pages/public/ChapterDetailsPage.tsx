@@ -703,26 +703,31 @@ export default function ChapterDetailsPage() {
 																							);
 																						}
 																						// Regular paragraph with HTML formatting support
-																						return paragraph.trim() ? (
-																							<p
-																								key={
-																									idx
-																								}
-																								className="mb-4 text-lg"
-																								dangerouslySetInnerHTML={{
-																									__html: paragraph
-																										.replace(
-																											/\*\*(.*?)\*\*/g,
-																											"<strong>$1</strong>",
-																										) // Bold
-																										.replace(
-																											/\*(.*?)\*/g,
-																											"<em>$1</em>",
-																										), // Italic
-																									// We keep other HTML tags as-is (underline, spans for color, etc.)
-																								}}
-																							/>
-																						) : null;
+																						if (
+																							paragraph.trim()
+																						) {
+																							return (
+																								<p
+																									key={
+																										idx
+																									}
+																									className="mb-4 text-lg"
+																									dangerouslySetInnerHTML={{
+																										__html: paragraph
+																											.replace(
+																												/\*\*(.*?)\*\*/g,
+																												"<strong>$1</strong>",
+																											) // Bold
+																											.replace(
+																												/\*(.*?)\*/g,
+																												"<em>$1</em>",
+																											), // Italic
+																										// We keep other HTML tags as-is (underline, spans for color, etc.)
+																									}}
+																								/>
+																							);
+																						}
+																						return null;
 																					},
 																				)}
 																		</div>
@@ -756,175 +761,66 @@ export default function ChapterDetailsPage() {
 								<div className="book-content p-8">
 									{/* Display all elements in the order they appear in the database */}
 									<div className="prose prose-lg max-w-none leading-relaxed">
-										{elements
-											.filter(
-												(element) =>
-													element.type === "Header" ||
-													element.type ===
-														"CodeFragment" ||
-													(element.type !== "Image" &&
-														element.type !==
-															"Form" &&
-														element.content),
-											)
-											.map((element) => (
-												<div
-													key={element.id}
-													className="mb-6"
-												>
-													{" "}
-													{element.type ===
-														"Header" &&
-														element.content && (
-															<h2
-																className="mb-4 border-b border-gray-200 pb-2 text-xl font-bold text-[var(--color-primary)]"
-																dangerouslySetInnerHTML={{
-																	__html: element.content
-																		.trim()
-																		.startsWith(
-																			"#",
-																		)
-																		? element.content
-																				.trim()
-																				.replace(
-																					/^#+\s*/,
-																					"",
-																				)
-																				.replace(
-																					/\*\*(.*?)\*\*/g,
-																					"<strong>$1</strong>",
-																				) // Bold
-																				.replace(
-																					/\*(.*?)\*/g,
-																					"<em>$1</em>",
-																				) // Italic
-																		: element.content
-																				.replace(
-																					/\*\*(.*?)\*\*/g,
-																					"<strong>$1</strong>",
-																				) // Bold
-																				.replace(
-																					/\*(.*?)\*/g,
-																					"<em>$1</em>",
-																				), // Italic
-																}}
-															/>
-														)}
-													{element.type ===
-														"CodeFragment" &&
-														element.content && (
-															<pre className="relative mb-6 overflow-x-auto rounded-lg bg-gray-50 p-4 font-mono text-sm shadow-lg">
-																<div className="mb-2 flex gap-2">
-																	<div className="h-3 w-3 rounded-full bg-red-500"></div>
-																	<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-																	<div className="h-3 w-3 rounded-full bg-green-500"></div>
-																</div>
-																<code>
-																	{
-																		element.content
-																	}
-																</code>
-															</pre>
-														)}
-													{element.type !==
-														"Header" &&
-														element.type !==
-															"Image" &&
-														element.type !==
-															"CodeFragment" &&
-														element.type !==
-															"Form" &&
-														element.content && (
-															<div className="content-element">
-																{element.content
-																	.split(
-																		/\r?\n/,
+										{elements.map((element) => (
+											<div
+												key={element.id}
+												className="mb-6"
+											>
+												{element.type === "Header" &&
+													element.content && (
+														<h2
+															className="mb-4 border-b border-gray-200 pb-2 text-xl font-bold text-[var(--color-primary)]"
+															dangerouslySetInnerHTML={{
+																__html: element.content
+																	.trim()
+																	.startsWith(
+																		"#",
 																	)
-																	.map(
-																		(
-																			paragraph,
-																			idx,
-																		) => {
-																			// Check if the paragraph is a header (starts with # in markdown style)
-																			if (
-																				paragraph
-																					.trim()
-																					.startsWith(
-																						"#",
-																					)
-																			) {
-																				const headerText =
-																					paragraph
-																						.trim()
-																						.replace(
-																							/^#+\s*/,
-																							"",
-																						);
-																				return (
-																					<h3
-																						key={
-																							idx
-																						}
-																						className="text-l mb-3 mt-6 font-bold text-[var(--color-primary)]"
-																					>
-																						{
-																							headerText
-																						}
-																					</h3>
-																				);
-																			}
-																			// Regular paragraph with HTML formatting support
-																			return paragraph.trim() ? (
-																				<p
-																					key={
-																						idx
-																					}
-																					className="mb-4 text-lg"
-																					dangerouslySetInnerHTML={{
-																						__html: paragraph
-																							.replace(
-																								/\*\*(.*?)\*\*/g,
-																								"<strong>$1</strong>",
-																							) // Bold
-																							.replace(
-																								/\*(.*?)\*/g,
-																								"<em>$1</em>",
-																							), // Italic
-																						// We keep other HTML tags as-is (underline, spans for color, etc.)
-																					}}
-																				/>
-																			) : null;
-																		},
-																	)}
+																	? element.content
+																			.trim()
+																			.replace(
+																				/^#+\s*/,
+																				"",
+																			)
+																			.replace(
+																				/\*\*(.*?)\*\*/g,
+																				"<strong>$1</strong>",
+																			) // Bold
+																			.replace(
+																				/\*(.*?)\*/g,
+																				"<em>$1</em>",
+																			) // Italic
+																	: element.content
+																			.replace(
+																				/\*\*(.*?)\*\*/g,
+																				"<strong>$1</strong>",
+																			) // Bold
+																			.replace(
+																				/\*(.*?)\*/g,
+																				"<em>$1</em>",
+																			), // Italic
+															}}
+														/>
+													)}
+												{element.type ===
+													"CodeFragment" &&
+													element.content && (
+														<pre className="relative mb-6 overflow-x-auto rounded-lg bg-gray-50 p-4 font-mono text-sm shadow-lg">
+															<div className="mb-2 flex gap-2">
+																<div className="h-3 w-3 rounded-full bg-red-500"></div>
+																<div className="h-3 w-3 rounded-full bg-yellow-500"></div>
+																<div className="h-3 w-3 rounded-full bg-green-500"></div>
 															</div>
-														)}
-												</div>
-											))}
-									</div>
-
-									{/* Display images in a gallery section if there are any */}
-									{elements.some(
-										(element) =>
-											element.type === "Image" &&
-											element.image,
-									) && (
-										<div className="mt-10 border-t border-gray-200 pt-8">
-											<h3 className="mb-6 text-xl font-bold text-[var(--color-primary)]">
-												Images
-											</h3>
-											<div className="grid grid-cols-1 gap-8">
-												{elements
-													.filter(
-														(element) =>
-															element.type ===
-																"Image" &&
-															element.image,
-													)
-													.map((element) => (
-														<div
-															key={element.id}
-															className="flex justify-center"
-														>
+															<code>
+																{
+																	element.content
+																}
+															</code>
+														</pre>
+													)}
+												{element.type === "Image" &&
+													element.image && (
+														<div className="my-6 flex justify-center">
 															<img
 																src={
 																	element.image
@@ -933,37 +829,13 @@ export default function ChapterDetailsPage() {
 																	element.title ||
 																	"Chapter image"
 																}
-																className="max-h-[600px] w-auto rounded-lg object-contain transition-transform hover:scale-105"
+																className="max-h-[400px] w-auto rounded-lg object-contain shadow-md transition-transform hover:scale-105"
 															/>
 														</div>
-													))}
-											</div>
-										</div>
-									)}
-
-									{/* Display quiz forms in a separate section if there are any */}
-									{elements.some(
-										(element) =>
-											element.type === "Form" &&
-											element.formId,
-									) && (
-										<div className="mt-10 border-t border-gray-200 pt-8">
-											<h3 className="mb-6 text-xl font-bold text-[var(--color-primary)]">
-												Knowledge Check
-											</h3>
-											<div className="space-y-6">
-												{elements
-													.filter(
-														(element) =>
-															element.type ===
-																"Form" &&
-															element.formId,
-													)
-													.map((element) => (
-														<div
-															key={element.id}
-															className="overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner"
-														>
+													)}
+												{element.type === "Form" &&
+													element.formId && (
+														<div className="my-6 overflow-hidden rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-6 shadow-inner">
 															<div className="mb-4 flex items-center gap-3">
 																<FiTarget className="h-6 w-6 text-blue-600" />
 																<h3 className="text-xl font-semibold text-blue-800">
@@ -993,10 +865,82 @@ export default function ChapterDetailsPage() {
 																<BsRocketTakeoff className="ml-2 h-5 w-5" />
 															</button>
 														</div>
-													))}
+													)}
+												{element.type !== "Header" &&
+													element.type !== "Image" &&
+													element.type !==
+														"CodeFragment" &&
+													element.type !== "Form" &&
+													element.content && (
+														<div className="content-element">
+															{element.content
+																.split(/\r?\n/)
+																.map(
+																	(
+																		paragraph,
+																		idx,
+																	) => {
+																		// Check if the paragraph is a header (starts with # in markdown style)
+																		if (
+																			paragraph
+																				.trim()
+																				.startsWith(
+																					"#",
+																				)
+																		) {
+																			const headerText =
+																				paragraph
+																					.trim()
+																					.replace(
+																						/^#+\s*/,
+																						"",
+																					);
+																			return (
+																				<h3
+																					key={
+																						idx
+																					}
+																					className="text-l mb-3 mt-6 font-bold text-[var(--color-primary)]"
+																				>
+																					{
+																						headerText
+																					}
+																				</h3>
+																			);
+																		}
+																		// Regular paragraph with HTML formatting support
+																		if (
+																			paragraph.trim()
+																		) {
+																			return (
+																				<p
+																					key={
+																						idx
+																					}
+																					className="mb-4 text-lg"
+																					dangerouslySetInnerHTML={{
+																						__html: paragraph
+																							.replace(
+																								/\*\*(.*?)\*\*/g,
+																								"<strong>$1</strong>",
+																							) // Bold
+																							.replace(
+																								/\*(.*?)\*/g,
+																								"<em>$1</em>",
+																							), // Italic
+																						// We keep other HTML tags as-is (underline, spans for color, etc.)
+																					}}
+																				/>
+																			);
+																		}
+																		return null;
+																	},
+																)}
+														</div>
+													)}
 											</div>
-										</div>
-									)}
+										))}
+									</div>
 								</div>
 							</motion.div>
 						)}

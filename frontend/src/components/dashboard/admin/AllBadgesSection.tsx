@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Medal, Trash2 } from "lucide-react";
 import { FiAward, FiStar } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Badge {
 	id: string;
@@ -45,8 +45,30 @@ const BadgeGrid = ({
 	};
 
 	const [currentPage, setCurrentPage] = useState(0);
-	const badgesPerPage = 6; // Show 2 rows with 3 badges each
-	const totalPages = Math.ceil(badges.length / badgesPerPage);
+	const badgesPerPage = {
+		mobile: 1, // Show only 1 badge on mobile
+		desktop: 3, // Show only 3 badges on desktop (1 row)
+	};
+
+	// Get actual badges per page depending on screen size
+	// Use window.innerWidth to check if we're on mobile or not
+	const [isMobile, setIsMobile] = useState(
+		typeof window !== "undefined" && window.innerWidth < 640,
+	);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setIsMobile(window.innerWidth < 640);
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
+
+	const actualBadgesPerPage = isMobile
+		? badgesPerPage.mobile
+		: badgesPerPage.desktop;
+	const totalPages = Math.ceil(badges.length / actualBadgesPerPage);
 
 	const handleNextPage = (e: React.MouseEvent) => {
 		e.stopPropagation();
@@ -59,17 +81,41 @@ const BadgeGrid = ({
 	};
 
 	const visibleBadges = badges.slice(
-		currentPage * badgesPerPage,
-		(currentPage + 1) * badgesPerPage,
+		currentPage * actualBadgesPerPage,
+		(currentPage + 1) * actualBadgesPerPage,
 	);
 
 	return (
 		<div className="relative">
-			<div className="grid grid-cols-3 gap-2 md:grid-cols-3 lg:grid-cols-3">
+			{/* Navigation arrow - previous (only visible if we have multiple pages) */}
+			{totalPages > 1 && (
+				<button
+					onClick={handlePrevPage}
+					className="absolute left-0 top-1/2 z-10 -translate-x-2 -translate-y-1/2 rounded-full bg-gray-100 p-2 shadow-md transition-colors hover:bg-gray-200 sm:-translate-x-4"
+					aria-label="Previous page"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					>
+						<path d="M15 18l-6-6 6-6" />
+					</svg>
+				</button>
+			)}
+
+			{/* Badge Grid - Centered badges with flex-based layout on mobile */}
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				{visibleBadges.map((badge, index) => (
 					<motion.div
 						key={index}
-						className="group flex w-auto cursor-pointer flex-col items-center rounded-xl bg-gradient-to-br from-white to-gray-50 p-3 transition-all hover:-translate-y-1 hover:shadow-lg"
+						className="group mx-auto flex w-auto max-w-[200px] cursor-pointer flex-col items-center rounded-xl bg-gradient-to-br from-white to-gray-50 p-4 transition-all hover:-translate-y-1 hover:shadow-lg sm:mx-0 sm:p-3"
 						onClick={() => onBadgeClick(badge)}
 						whileHover={{ scale: 1.02 }}
 						role="button"
@@ -80,7 +126,7 @@ const BadgeGrid = ({
 							<img
 								src={displayBadgeIcon(badge)}
 								alt={badge.name}
-								className="relative h-16 w-16 rounded-full bg-white p-1 shadow-sm transition-transform group-hover:scale-105"
+								className="sm:h-18 sm:w-18 relative h-24 w-24 rounded-full bg-white p-1 shadow-sm transition-transform group-hover:scale-105 md:h-16 md:w-16"
 							/>
 							<button
 								onClick={(e) => {
@@ -93,10 +139,10 @@ const BadgeGrid = ({
 								<Trash2 size={12} />
 							</button>
 						</div>
-						<h3 className="text-center text-sm font-semibold text-gray-800 group-hover:text-[var(--color-primary)]">
+						<h3 className="text-center text-base font-semibold text-gray-800 group-hover:text-[var(--color-primary)] sm:text-sm">
 							{badge.name}
 						</h3>
-						<span className="mt-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600">
+						<span className="mt-1 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 sm:px-2.5 sm:py-0.5">
 							{isExternal
 								? (badge as ExternalBadge).category
 								: (badge as Badge).level}
@@ -105,51 +151,35 @@ const BadgeGrid = ({
 				))}
 			</div>
 
+			{/* Navigation arrow - next (only visible if we have multiple pages) */}
 			{totalPages > 1 && (
-				<div className="mt-4 flex justify-center gap-4">
-					<button
-						onClick={handlePrevPage}
-						className="rounded-full bg-gray-200 p-2 transition-colors hover:bg-gray-300"
-						aria-label="Previous page"
+				<button
+					onClick={handleNextPage}
+					className="absolute right-0 top-1/2 z-10 -translate-y-1/2 translate-x-2 rounded-full bg-gray-100 p-2 shadow-md transition-colors hover:bg-gray-200 sm:translate-x-4 md:right-2"
+					aria-label="Next page"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<path d="M15 18l-6-6 6-6" />
-						</svg>
-					</button>
-					<div className="flex items-center">
-						<span className="text-sm text-gray-500">
-							{currentPage + 1}/{totalPages}
-						</span>
-					</div>
-					<button
-						onClick={handleNextPage}
-						className="rounded-full bg-gray-200 p-2 transition-colors hover:bg-gray-300"
-						aria-label="Next page"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="20"
-							height="20"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<path d="M9 18l6-6-6-6" />
-						</svg>
-					</button>
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+				</button>
+			)}
+
+			{/* Page indicator */}
+			{totalPages > 1 && (
+				<div className="mt-4 flex justify-center">
+					<span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-500">
+						{currentPage + 1}/{totalPages}
+					</span>
 				</div>
 			)}
 		</div>
@@ -186,8 +216,8 @@ const AllBadgesSection = ({
 					</p>
 				</div>
 			) : (
-				<div className="grid grid-cols-2 gap-4">
-					<div className="space-y-4">
+				<div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-12">
+					<div className="space-y-4 md:pr-4">
 						<h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
 							<span className="rounded-full bg-blue-100 p-1">
 								<FiAward className="text-blue-600" />
@@ -207,7 +237,7 @@ const AllBadgesSection = ({
 						)}
 					</div>
 
-					<div className="space-y-4">
+					<div className="space-y-4 md:pl-4">
 						<h3 className="flex items-center gap-2 text-lg font-semibold text-gray-800">
 							<span className="rounded-full bg-purple-100 p-1">
 								<FiStar className="text-purple-600" />
